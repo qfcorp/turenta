@@ -2,6 +2,16 @@
 
 Última actualización: 6 de noviembre de 2026
 
+## 7 nov 2026 — Nace TuRenta (copia de TuEvento) para Zombie Ice (decisión de Dimitry)
+- Pedido: un programa Tukán que maneje la página de Zombie Ice, con reservas, cobro por **Stripe** y que el cliente vea cómo va su reserva.
+- Base: **TuEvento** (TuPlanner no aporta para alquiler de fiestas). Nombre provisional **TuRenta**, repo `qfcorp/turenta`, dirección `turenta.tukanec.com`, servidor de Tukán.
+- Stripe: **modo prueba primero**; cuando Zombie Ice acepte se ponen las claves reales de **su** cuenta de Stripe.
+- Pago: **el cliente elige** depósito o pago completo.
+- Hecho: migración 200, `src/Reservas.php`, `src/Stripe.php`, páginas `reservar`, `stripe`, `stripe_webhook`, portal en inglés, configuración, paquetes,
+  `bin/cargar_zombieice.php`, `tests/logica_200_reservas_stripe.php` (81 pruebas). Todo lo de TuEvento sigue pasando (2261 pantallas).
+- Pendiente: panel del negocio en inglés (hoy el panel sigue en español), extras pagados en línea desde la reserva, mensajes de WhatsApp/correo en inglés,
+  impuesto de Florida si aplica, encuesta y reseña en inglés.
+
 ## 6 nov 2026 — Precios nuevos para todos los programas Tukán (decisión de Dimitry)
 - **Básico $12 + IVA** con 3 módulos a elegir; **cada módulo más $5 + IVA**; **Completo $25 + IVA** con todo y el Asistente IA.
 - **Asistente IA $3 + IVA en Básico, uso limitado** (tope sugerido del mes **$1,50**, antes $4). «Varias sedes» y los módulos gratis no cambian.

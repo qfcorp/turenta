@@ -7,6 +7,21 @@ Dirección: **turenta.tukanec.com** (servidor qfcorp). Web de la marca: tukansof
 - Cómo está hecho y reglas para programar: [docs/GUIA_DESARROLLO.md](docs/GUIA_DESARROLLO.md)
 - **Manual para el cliente** (con capturas reales): [docs/Manual_TuRenta.pdf](docs/Manual_TuRenta.pdf) · versión por módulo: [docs/MANUAL.md](docs/MANUAL.md) · se regenera con `bash docs/manual/generar/generar.sh`
 
+## Qué es TuRenta
+Copia de **TuEvento** (qfcorp/tuevento) para **negocios de alquiler para fiestas en EE.UU.** (espuma, nieve, inflables, carpas…),
+nacida el 7 nov 2026 para el cliente **Zombie Ice** (Florida). Además de todo lo de TuEvento trae (migración 200):
+
+- **Reserva en línea en inglés** (`/?r=reservar&s=<slug>`): el cliente elige la fiesta (paquete publicado), la fecha y una **hora libre**
+  (un paquete puede hacerlo uno o varios **equipos** = espacios; se cuenta el viaje e instalación con las horas de montaje y desmontaje),
+  escribe la dirección de la fiesta y sus datos, y pasa a pagar. La hora queda retenida solo ese día.
+- **Cobro con Stripe Checkout**: el cliente **elige pagar el depósito (% de reserva) o todo**. Al pagar, la fecha queda separada sola.
+  Confirmación al volver (`/?r=stripe`) y por **webhook firmado** (`/?r=stripe_webhook&s=<slug>`); nunca cobra dos veces; si otro tomó el
+  equipo mientras pagaba, pasa a otro equipo libre del mismo paquete. Modo prueba con claves `sk_test_`.
+- **Portal «My Party» en inglés** (cuando el negocio tiene `idioma_publico = en`): estado, cuenta regresiva, pasos, pagos y botón para pagar el saldo.
+- Panel: **Configuración → Reserva en línea y Stripe** (horas, aviso mínimo, condiciones, claves) y en **Paquetes** la sección «Reserva en línea».
+- Zona horaria configurable (`TURENTA_ZONA`, el instalador pone `America/New_York`).
+- Datos de Zombie Ice: `php bin/cargar_zombieice.php [correo]` (6 fiestas, extras, equipos y reserva en línea).
+
 ## Qué hace
 - Calendario por espacios **sin doble reserva** (la base de datos lo impide), con horas de montaje y desmontaje, fechas cerradas y "próximos sábados".
 - Embudo de ventas: consulta → cotizado → separado → confirmado → realizado, con seguimiento (llamadas, visitas, degustaciones) y tareas por evento.

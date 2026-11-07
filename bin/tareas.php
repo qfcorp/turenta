@@ -26,7 +26,7 @@ if (is_file($envFile)) {
     }
 }
 spl_autoload_register(function (string $c): void {
-    if (str_starts_with($c, 'TuRenta\\') && is_file($f = RAIZ . '/src/' . substr($c, 9) . '.php')) require $f;
+    if (str_starts_with($c, 'TuRenta\\') && is_file($f = RAIZ . '/src/' . substr($c, 8) . '.php')) require $f;
 });
 if (is_file(RAIZ . '/vendor/autoload.php')) require RAIZ . '/vendor/autoload.php';
 

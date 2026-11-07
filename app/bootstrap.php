@@ -24,7 +24,7 @@ if (is_file($envFile)) {
 // 2) Cargar clases de src/ y librerías de composer (TCPDF para los PDF)
 spl_autoload_register(function (string $clase): void {
     if (str_starts_with($clase, 'TuRenta\\')) {
-        $archivo = RAIZ . '/src/' . substr($clase, 9) . '.php';
+        $archivo = RAIZ . '/src/' . substr($clase, 8) . '.php';
         if (is_file($archivo)) {
             require $archivo;
         }

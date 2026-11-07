@@ -90,7 +90,7 @@ done
 echo "== 4. Configuracion"
 EXTRA=""
 if [ -f "$APP/config/.env" ]; then   # se conservan Telegram, Payphone y la conexion con el Panel Tukan Central si ya estaban
-  EXTRA="$(grep -E '^(TELEGRAM_|PAYPHONE_API_BASE=|TUKAN_|TURENTA_ANDROID_HUELLAS=|TURENTA_GOOGLE_PLAY_COBRO=)' "$APP/config/.env" || true)"
+  EXTRA="$(grep -E '^(TELEGRAM_|PAYPHONE_API_BASE=|STRIPE_API_BASE=|TUKAN_|TURENTA_ANDROID_HUELLAS=|TURENTA_GOOGLE_PLAY_COBRO=|TURENTA_ZONA=)' "$APP/config/.env" || true)"
 fi
 {
   echo "TURENTA_DB_HOST=127.0.0.1"
@@ -101,6 +101,8 @@ fi
   echo "TURENTA_UPLOADS=$APP/uploads"
   echo "TURENTA_BORRADOS=$BORRADOS"
   [ -n "$EXTRA" ] && echo "$EXTRA"
+  # Hora del programa: TuRenta es para negocios de EE.UU. (Florida). Se conserva si ya estaba.
+  echo "$EXTRA" | grep -q '^TURENTA_ZONA=' || echo "TURENTA_ZONA=${ZONA:-America/New_York}"
 } > "$APP/config/.env.nuevo"
 mv "$APP/config/.env.nuevo" "$APP/config/.env"
 chmod 640 "$APP/config/.env" && sudo chgrp www-data "$APP/config/.env" && echo "   listo"

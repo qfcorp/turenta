@@ -9,7 +9,7 @@ use TuRenta\{Configuracion, Eventos};
 exigir(es_admin_total($u), 'Solo el dueño o un administrador puede cambiar la configuración del negocio.');
 $nid = (int) $u['negocio_id'];
 $config = new Configuracion(db());
-$tabs = ['datos' => 'Negocio', 'reglas' => 'Reglas', 'cobros' => 'Cobros en línea', 'pagina' => 'Página pública',
+$tabs = ['datos' => 'Negocio', 'reglas' => 'Reglas', 'cobros' => 'Cobros en línea', 'reserva' => 'Reserva en línea y Stripe', 'pagina' => 'Página pública',
          'tareas' => 'Tareas', 'calendario' => 'Google Calendar', 'otros' => 'Más'];
 if (!modulo_activo($u, 'exportar')) unset($tabs['calendario']);   // Anexo B: Google Calendar es del módulo "Exportar"
 $tab = (string) ($_GET['tab'] ?? 'datos');
@@ -45,6 +45,10 @@ if (es_post()) {
                 $config->guardarCobros($nid, $_POST);
                 aviso('Datos de cobro guardados. Tus clientes los ven en su portal de pagos.');
                 break;
+            case 'reserva':
+                $config->guardarReserva($nid, $_POST);
+                aviso('Reserva en línea y Stripe guardados.');
+                break;
             case 'tarea':
                 $id = (int) ($_POST['id'] ?? 0);
                 $config->guardarTarea($nid, $_POST, $id ?: null);
@@ -77,7 +81,7 @@ if (es_post()) {
         }
     } catch (RuntimeException $e) {
         aviso($e->getMessage(), 'error');
-        if (in_array($accion, ['datos', 'reglas', 'cobros'], true)) $_SESSION['config_form'] = [$accion => $_POST];
+        if (in_array($accion, ['datos', 'reglas', 'cobros', 'reserva'], true)) $_SESSION['config_form'] = [$accion => $_POST];
     }
     redirigir('configuracion', ['tab' => $volver]);
 }
@@ -88,7 +92,7 @@ $previo = $_SESSION['config_form'] ?? [];
 unset($_SESSION['config_form']);
 foreach ($previo as $grupo => $valores) {
     foreach ((array) $valores as $k => $v) {
-        if (array_key_exists($k, $negocio) && !in_array($k, ['payphone_token', 'csrf', 'id', 'token_ical'], true)) $negocio[$k] = $v;
+        if (array_key_exists($k, $negocio) && !in_array($k, ['payphone_token', 'stripe_secret_key', 'stripe_webhook_secret', 'csrf', 'id', 'token_ical'], true)) $negocio[$k] = $v;
     }
 }
 $tareas = $tab === 'tareas' ? $config->tareas($nid) : [];

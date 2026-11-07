@@ -88,6 +88,29 @@ $filaItem = function (int $i, ?array $it) use ($opcionesProductos): string {
         <strong data-doc-paq-resumen>—</strong>
     </div>
     <small class="suave">* Total para el número de invitados de arriba, sin IVA.</small>
+    <fieldset class="bloque" style="margin-top:16px">
+        <legend><strong>Reserva en línea</strong></legend>
+        <div class="casillas"><label><input type="checkbox" name="en_linea" value="1" <?= !empty($editar['publico']) ? 'checked' : '' ?>> Se reserva en línea (sale en la página de reservas)</label></div>
+        <div class="rejilla-form">
+            <div class="campo"><label for="qslug">Nombre corto para la dirección</label>
+                <input id="qslug" name="slug" maxlength="60" value="<?= e($editar['slug'] ?? '') ?>" placeholder="signature-experience"></div>
+            <div class="campo"><label for="qdur">Duración (minutos)</label>
+                <input type="number" id="qdur" name="duracion_min" min="15" max="1440" step="5" value="<?= (int) ($editar['duracion_min'] ?? 60) ?>"></div>
+            <div class="campo"><label for="qmax">Máximo de invitados (vacío = sin límite)</label>
+                <input type="number" id="qmax" name="maximo_invitados" min="1" max="20000" value="<?= e((string) ($editar['maximo_invitados'] ?? '')) ?>"></div>
+            <div class="campo"><label for="qord">Orden en la página</label>
+                <input type="number" id="qord" name="orden" min="0" max="999" value="<?= (int) ($editar['orden'] ?? 0) ?>"></div>
+            <div class="campo" style="grid-column:1/-1"><label for="qfoto">Foto (dirección https de la imagen)</label>
+                <input type="url" id="qfoto" name="foto_url" maxlength="400" value="<?= e($editar['foto_url'] ?? '') ?>" placeholder="https://…/foto.webp"></div>
+        </div>
+        <p class="g-nota" style="margin:8px 0 6px">¿Qué equipos (espacios) pueden hacer este paquete? La reserva usa el primero que esté libre.</p>
+        <div class="casillas">
+            <?php foreach ($espaciosNegocio as $es): ?>
+                <label><input type="checkbox" name="espacios_paquete[]" value="<?= (int) $es['id'] ?>" <?= in_array((int) $es['id'], $espaciosElegidos, true) ? 'checked' : '' ?>> <?= e($es['nombre']) ?></label>
+            <?php endforeach; ?>
+            <?php if (!$espaciosNegocio): ?><p class="vacio">Primero crea tus equipos en Espacios.</p><?php endif; ?>
+        </div>
+    </fieldset>
     <div class="acciones" style="margin-top:14px">
         <button class="boton" type="submit"><?= !empty($editar['id']) ? 'Guardar paquete' : 'Crear paquete' ?></button>
         <a class="boton boton-claro" href="<?= e(url('paquetes')) ?>">Cancelar</a>

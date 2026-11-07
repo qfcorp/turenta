@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 define('RAIZ', dirname(__DIR__));
 define('COOKIE_APP', 'te_app');   // cookie que deja la app de Android (?app=play)
-date_default_timezone_set('America/Guayaquil');
-
 // 1) Configuración: config/.env -> variables de entorno
 $envFile = RAIZ . '/config/.env';
 if (is_file($envFile)) {
@@ -20,6 +18,9 @@ if (is_file($envFile)) {
         }
     }
 }
+
+// Zona horaria del programa (TuRenta en EE.UU.: TURENTA_ZONA=America/New_York en config/.env)
+date_default_timezone_set(getenv('TURENTA_ZONA') ?: 'America/Guayaquil');
 
 // 2) Cargar clases de src/ y librerías de composer (TCPDF para los PDF)
 spl_autoload_register(function (string $clase): void {
@@ -431,4 +432,57 @@ function registrar_cambio(int $negocioId, ?int $eventoId, string $accion, ?array
 function ip_visitante(): string
 {
     return substr((string) ($_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? ''), 0, 45);
+}
+
+
+// ---------------------------------------------------------------------------
+// Páginas del cliente en inglés (TuRenta para negocios de EE.UU.: negocios.idioma_publico = 'en', migración 200)
+// ---------------------------------------------------------------------------
+
+function vista_publica_en(string $nombre, array $datos = [], string $titulo = 'TuRenta', ?array $marca = null): void
+{
+    extract($datos, EXTR_SKIP);
+    ob_start();
+    require RAIZ . "/app/vistas/$nombre.php";
+    $contenido = ob_get_clean();
+    require RAIZ . '/app/vistas/_publico_en.php';
+}
+
+/** $1,234.50 */
+function dinero_en(float|string|null $v): string
+{
+    $v = (float) $v;
+    return ($v < 0 ? '-$' : '$') . number_format(abs($v), 2, '.', ',');
+}
+
+/** Saturday, December 13, 2026 */
+function fecha_en(?string $fecha, bool $larga = true): string
+{
+    if (!$fecha) return '';
+    $t = strtotime($fecha);
+    return $t === false ? '' : date($larga ? 'l, F j, Y' : 'M j, Y', $t);
+}
+
+/** 3:00 PM */
+function hora_en(?string $hora): string
+{
+    if (!$hora) return '';
+    $t = strtotime('2000-01-01 ' . substr($hora, 0, 5));
+    return $t === false ? '' : date('g:i A', $t);
+}
+
+function verificar_csrf_en(): void
+{
+    if (!hash_equals(token_csrf(), (string) ($_POST['csrf'] ?? ''))) {
+        http_response_code(400);
+        exit('This page expired. Please go back, reload the page and try again.');
+    }
+}
+
+/** (954) 555-0123 a partir de 19545550123 */
+function telefono_en(?string $tel): string
+{
+    $d = (string) preg_replace('/\D/', '', (string) $tel);
+    if (strlen($d) === 11 && $d[0] === '1') $d = substr($d, 1);
+    return strlen($d) === 10 ? '(' . substr($d, 0, 3) . ') ' . substr($d, 3, 3) . '-' . substr($d, 6) : (string) $tel;
 }

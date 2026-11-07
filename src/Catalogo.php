@@ -187,6 +187,60 @@ final class Catalogo
         return $p;
     }
 
+    /**
+     * TuRenta (migración 200): reserva en línea del paquete. $d: en_linea, slug, duracion_min, maximo_invitados, foto_url,
+     * orden, espacios[] (equipos que pueden hacerlo).
+     */
+    public function guardarReservaPaquete(int $negocioId, int $paqueteId, array $d): void
+    {
+        if (!$this->paquete($negocioId, $paqueteId)) throw new RuntimeException('No se encontró el paquete.');
+        $enLinea = !empty($d['en_linea']);
+        $slug = strtolower(trim((string) ($d['slug'] ?? '')));
+        $slug = trim((string) preg_replace('/[^a-z0-9]+/', '-', $slug), '-');
+        if ($slug === '' && $enLinea) throw new RuntimeException('Escribe el nombre corto del paquete para la dirección (ej. signature-experience).');
+        if (strlen($slug) > 60) throw new RuntimeException('El nombre corto es muy largo (máximo 60 letras).');
+        if ($slug !== '') {
+            $st = $this->db->prepare('SELECT 1 FROM paquetes WHERE negocio_id = ? AND slug = ? AND id <> ?');
+            $st->execute([$negocioId, $slug, $paqueteId]);
+            if ($st->fetchColumn()) throw new RuntimeException('Otro paquete ya usa el nombre corto «' . $slug . '». Elige otro.');
+        }
+        $dur = (int) ($d['duracion_min'] ?? 60);
+        if ($dur < 15 || $dur > 1440) throw new RuntimeException('La duración debe ser entre 15 minutos y 24 horas.');
+        $max = trim((string) ($d['maximo_invitados'] ?? '')) === '' ? null : (int) $d['maximo_invitados'];
+        if ($max !== null && ($max < 1 || $max > 20000)) throw new RuntimeException('Revisa el máximo de invitados.');
+        $foto = trim((string) ($d['foto_url'] ?? ''));
+        if ($foto !== '' && !preg_match('#^https://[^\s"<>]{4,390}$#', $foto)) throw new RuntimeException('La foto debe ser una dirección que empiece con https://');
+        $espacios = array_values(array_unique(array_filter(array_map('intval', (array) ($d['espacios'] ?? [])))));
+        if ($enLinea && !$espacios) throw new RuntimeException('Para reservar en línea, marca qué equipos (espacios) pueden hacer este paquete.');
+        if ($espacios) {
+            $marcas = implode(',', array_fill(0, count($espacios), '?'));
+            $st = $this->db->prepare("SELECT count(*) FROM espacios WHERE negocio_id = ? AND id IN ($marcas)");
+            $st->execute([$negocioId, ...$espacios]);
+            if ((int) $st->fetchColumn() !== count($espacios)) throw new RuntimeException('Uno de los equipos no existe. Recarga la página.');
+        }
+        $propia = !$this->db->inTransaction();
+        if ($propia) $this->db->beginTransaction();
+        try {
+            $this->db->prepare('UPDATE paquetes SET publico = ?, slug = ?, duracion_min = ?, maximo_invitados = ?, foto_url = ?, orden = ? WHERE id = ? AND negocio_id = ?')
+                     ->execute([$enLinea ? 'true' : 'false', $slug ?: null, $dur, $max, $foto ?: null, (int) ($d['orden'] ?? 0), $paqueteId, $negocioId]);
+            $this->db->prepare('DELETE FROM paquete_espacios WHERE paquete_id = ?')->execute([$paqueteId]);
+            $ins = $this->db->prepare('INSERT INTO paquete_espacios (paquete_id, espacio_id) VALUES (?,?)');
+            foreach ($espacios as $e) $ins->execute([$paqueteId, $e]);
+            if ($propia) $this->db->commit();
+        } catch (\Throwable $e) {
+            if ($propia && $this->db->inTransaction()) $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    /** @return int[] equipos (espacios) del paquete */
+    public function espaciosPaquete(int $paqueteId): array
+    {
+        $st = $this->db->prepare('SELECT espacio_id FROM paquete_espacios WHERE paquete_id = ? ORDER BY espacio_id');
+        $st->execute([$paqueteId]);
+        return array_map('intval', $st->fetchAll(\PDO::FETCH_COLUMN));
+    }
+
     public function itemsPaquete(int $paqueteId): array
     {
         $st = $this->db->prepare('SELECT pi.id, pi.producto_id, pi.cantidad, pi.precio AS precio_paquete,

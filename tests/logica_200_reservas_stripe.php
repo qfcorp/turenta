@@ -178,3 +178,34 @@ titulo('8. Sin clave de Stripe');
 $db->prepare("UPDATE negocios SET stripe_secret_key = NULL WHERE id = ?")->execute([$nid]);
 check('No está listo', false, $stripe->listo($nid));
 check_error('No abre el pago', 'not turned on', fn() => $stripe->crearCheckout($e5, 10, 'Balance', 'https://x/ok', 'https://x/no'));
+
+titulo('9. Configuración y paquetes desde el panel');
+$cfg = new \TuRenta\Configuracion($db);
+check_error('Clave secreta mal pegada', 'sk_test_', fn() => $cfg->guardarReserva($nid, ['stripe_secret_key' => 'pk_test_123', 'reserva_paso_min' => 30]));
+check_error('Claves de modos distintos', 'mismo modo', fn() => $cfg->guardarReserva($nid, ['stripe_secret_key' => 'sk_test_1234567890abc', 'stripe_publishable_key' => 'pk_live_1234567890abc', 'reserva_paso_min' => 30]));
+check_error('Web sin https', 'https://', fn() => $cfg->guardarReserva($nid, ['sitio_externo' => 'http://zombieice.com', 'reserva_paso_min' => 30]));
+check_error('Horas al revés', 'después de la primera', fn() => $cfg->guardarReserva($nid, ['reserva_hora_desde' => '18:00', 'reserva_hora_hasta' => '10:00', 'reserva_paso_min' => 30]));
+$cfg->guardarReserva($nid, ['reserva_en_linea' => '1', 'idioma_publico' => 'en', 'reserva_hora_desde' => '09:30', 'reserva_hora_hasta' => '17:00',
+    'reserva_paso_min' => 45, 'reserva_dias_min' => 3, 'sitio_externo' => 'https://zombieice.com', 'stripe_secret_key' => 'sk_test_51NuevaClave0000000',
+    'stripe_webhook_secret' => 'whsec_nuevo0000000']);
+$n = $db->query("SELECT * FROM negocios WHERE id = $nid")->fetch();
+check('Guarda horas, paso y aviso', ['09:30', '17:00', 45, 3], [substr($n['reserva_hora_desde'], 0, 5), substr($n['reserva_hora_hasta'], 0, 5), (int) $n['reserva_paso_min'], (int) $n['reserva_dias_min']]);
+check('Guarda la clave secreta', 'sk_test_51NuevaClave0000000', $n['stripe_secret_key']);
+$cfg->guardarReserva($nid, ['reserva_en_linea' => '1', 'idioma_publico' => 'en', 'reserva_paso_min' => 45, 'stripe_secret_key' => '']);
+check('Campo vacío conserva la clave', 'sk_test_51NuevaClave0000000', $db->query("SELECT stripe_secret_key FROM negocios WHERE id = $nid")->fetchColumn());
+$cfg->guardarReserva($nid, ['reserva_paso_min' => 45, 'quitar_stripe' => '1']);
+check('Quitar Stripe borra las claves', [null, null], array_values($db->query("SELECT stripe_secret_key, stripe_webhook_secret FROM negocios WHERE id = $nid")->fetch(PDO::FETCH_NUM)));
+check('Cerrar la reserva en línea', null, (new Reservas($db))->negocio('zombieice'));
+
+$cat = new \TuRenta\Catalogo($db);
+check_error('En línea sin equipos', 'equipos', fn() => $cat->guardarReservaPaquete($nid, $paq, ['en_linea' => 1, 'slug' => 'x-y', 'duracion_min' => 60]));
+check_error('Nombre corto repetido', 'ya usa', function () use ($db, $nid, $cat, $camionA) {
+    $st = $db->prepare("INSERT INTO paquetes (negocio_id, nombre) VALUES (?, 'Otro') RETURNING id");
+    $st->execute([$nid]);
+    $cat->guardarReservaPaquete($nid, (int) $st->fetchColumn(), ['en_linea' => 1, 'slug' => 'Signature Experience', 'duracion_min' => 60, 'espacios' => [$camionA]]);
+});
+$cat->guardarReservaPaquete($nid, $paq, ['en_linea' => 1, 'slug' => 'Signature  Experience!', 'duracion_min' => 90, 'maximo_invitados' => '40', 'espacios' => [$camionB]]);
+$pq = $db->query("SELECT slug, duracion_min, maximo_invitados FROM paquetes WHERE id = $paq")->fetch();
+check('Nombre corto limpio', 'signature-experience', $pq['slug']);
+check('Duración y máximo', [90, 40], [(int) $pq['duracion_min'], (int) $pq['maximo_invitados']]);
+check('Equipos del paquete', [$camionB], $cat->espaciosPaquete($paq));

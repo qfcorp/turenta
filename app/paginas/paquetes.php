@@ -28,6 +28,12 @@ if (es_post()) {
                     'nombre' => campo('nombre'), 'descripcion' => campo('descripcion'),
                     'tipo_evento' => campo('tipo_evento'), 'minimo_invitados' => (int) campo('minimo_invitados', '0'),
                 ], $items);
+                // TuRenta (migración 200): reserva en línea del paquete
+                $cat->guardarReservaPaquete($nid, $nuevo, [
+                    'en_linea' => !empty($_POST['en_linea']), 'slug' => campo('slug'), 'duracion_min' => (int) campo('duracion_min', '60'),
+                    'maximo_invitados' => campo('maximo_invitados'), 'foto_url' => campo('foto_url'), 'orden' => (int) campo('orden', '0'),
+                    'espacios' => (array) ($_POST['espacios_paquete'] ?? []),
+                ]);
                 aviso($id ? 'Paquete guardado.' : 'Paquete creado. Ya lo puedes usar al cotizar.');
                 redirigir('paquetes', ['sim' => $nuevo]);
             case 'duplicar':
@@ -59,12 +65,15 @@ if ($puede && !empty($_GET['editar'])) {
     $editar = $cat->paquete($nid, (int) $_GET['editar']);
     if (!$editar) aviso('No se encontró ese paquete.', 'error');
 } elseif ($puede && !empty($_GET['nuevo'])) {
-    $editar = ['id' => null, 'nombre' => '', 'descripcion' => '', 'tipo_evento' => '', 'minimo_invitados' => 0, 'items' => []];
+    $editar = ['id' => null, 'nombre' => '', 'descripcion' => '', 'tipo_evento' => '', 'minimo_invitados' => 0, 'items' => [],
+               'publico' => false, 'slug' => '', 'duracion_min' => 60, 'maximo_invitados' => null, 'foto_url' => '', 'orden' => 0];
 }
+$espaciosNegocio = (new \TuRenta\Ventas(db()))->espacios($nid, false);
+$espaciosElegidos = !empty($editar['id']) ? $cat->espaciosPaquete((int) $editar['id']) : [];
 $borrador = $_SESSION['doc_paquete_borrador'] ?? null;
 unset($_SESSION['doc_paquete_borrador']);
 if ($borrador && $editar !== null) {
-    $editar = array_merge($editar, array_intersect_key($borrador, array_flip(['nombre', 'descripcion', 'tipo_evento', 'minimo_invitados'])));
+    $editar = array_merge($editar, array_intersect_key($borrador, array_flip(['nombre', 'descripcion', 'tipo_evento', 'minimo_invitados', 'slug', 'duracion_min', 'maximo_invitados', 'foto_url', 'orden'])));
     $editar['items'] = [];
     foreach ((array) ($borrador['items'] ?? []) as $fila) {
         if (!is_array($fila) || empty($fila['producto_id'])) continue;
@@ -96,4 +105,4 @@ $st = db()->prepare('SELECT iva_pct FROM negocios WHERE id = ?');
 $st->execute([$nid]);
 $ivaPct = (float) $st->fetchColumn();
 
-vista('paquetes', compact('paquetes', 'productos', 'editar', 'sim', 'simId', 'simN', 'resumen', 'puede', 'dueno', 'ivaPct'), 'Paquetes · TuRenta');
+vista('paquetes', compact('paquetes', 'productos', 'editar', 'sim', 'simId', 'simN', 'resumen', 'puede', 'dueno', 'ivaPct', 'espaciosNegocio', 'espaciosElegidos'), 'Paquetes · TuRenta');

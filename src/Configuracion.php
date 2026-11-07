@@ -163,6 +163,58 @@ final class Configuracion
                  ->execute([self::texto($d, 'pago_banco', 500), $deuna, $token ?: null, $store ?: null, $negocioId]);
     }
 
+    /**
+     * TuRenta (migración 200): reserva en línea y claves de Stripe.
+     * Las claves secretas no se muestran: si el campo viene vacío y ya había una, se conserva. "quitar_stripe" las borra.
+     */
+    public function guardarReserva(int $negocioId, array $d): void
+    {
+        $n = $this->negocio($negocioId);
+        $idioma = (string) ($d['idioma_publico'] ?? 'es') === 'en' ? 'en' : 'es';
+        $hora = function (string $k, string $def) use ($d): string {
+            $h = substr(trim((string) ($d[$k] ?? '')), 0, 5);
+            return preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $h) ? $h : $def;
+        };
+        $desde = $hora('reserva_hora_desde', '09:00');
+        $hasta = $hora('reserva_hora_hasta', '19:00');
+        if ($hasta < $desde) throw new RuntimeException('La última hora de inicio debe ser después de la primera.');
+        $paso = (int) ($d['reserva_paso_min'] ?? 30);
+        if ($paso < 10 || $paso > 240) throw new RuntimeException('Cada cuántos minutos se ofrece una hora: entre 10 y 240.');
+        $diasMin = (int) ($d['reserva_dias_min'] ?? 2);
+        if ($diasMin < 0 || $diasMin > 60) throw new RuntimeException('El aviso mínimo debe ser entre 0 y 60 días.');
+        $url = function (string $k) use ($d): ?string {
+            $v = trim((string) ($d[$k] ?? ''));
+            if ($v === '') return null;
+            if (!preg_match('#^https://[^\s"<>]{4,390}$#', $v)) throw new RuntimeException('Las direcciones web deben empezar con https://');
+            return $v;
+        };
+        $sk = trim((string) ($d['stripe_secret_key'] ?? ''));
+        $pk = trim((string) ($d['stripe_publishable_key'] ?? ''));
+        $wh = trim((string) ($d['stripe_webhook_secret'] ?? ''));
+        if (!empty($d['quitar_stripe'])) {
+            $sk = $pk = $wh = '';
+        } else {
+            // Se revisa solo lo que se escribió ahora; lo vacío conserva lo guardado
+            if ($sk !== '' && !Stripe::claveValida($sk)) {
+                throw new RuntimeException('La clave secreta de Stripe empieza con sk_test_ (prueba) o sk_live_ (real). Cópiala otra vez completa.');
+            }
+            if ($pk !== '' && !preg_match('/^pk_(test|live)_[A-Za-z0-9]{10,190}$/', $pk)) throw new RuntimeException('La clave publicable de Stripe empieza con pk_test_ o pk_live_.');
+            if ($wh !== '' && !preg_match('/^whsec_[A-Za-z0-9]{10,190}$/', $wh)) throw new RuntimeException('El secreto del webhook de Stripe empieza con whsec_.');
+            if ($sk === '') $sk = (string) ($n['stripe_secret_key'] ?? '');
+            if ($wh === '') $wh = (string) ($n['stripe_webhook_secret'] ?? '');
+            if ($pk === '') $pk = (string) ($n['stripe_publishable_key'] ?? '');
+            if ($sk !== '' && $pk !== '' && (str_contains($sk, '_test_') !== str_contains($pk, '_test_'))) {
+                throw new RuntimeException('Las dos claves de Stripe deben ser del mismo modo: las dos de prueba (test) o las dos reales (live).');
+            }
+        }
+        $this->db->prepare('UPDATE negocios SET reserva_en_linea = ?, idioma_publico = ?, reserva_hora_desde = ?, reserva_hora_hasta = ?,
+                                   reserva_paso_min = ?, reserva_dias_min = ?, reserva_condiciones = ?, sitio_externo = ?, logo_url = ?,
+                                   stripe_secret_key = ?, stripe_publishable_key = ?, stripe_webhook_secret = ? WHERE id = ?')
+                 ->execute([!empty($d['reserva_en_linea']) ? 'true' : 'false', $idioma, $desde, $hasta, $paso, $diasMin,
+                            self::texto($d, 'reserva_condiciones', 5000), $url('sitio_externo'), $url('logo_url'),
+                            $sk ?: null, $pk ?: null, $wh ?: null, $negocioId]);
+    }
+
     public function guardarTransmision(int $negocioId, string $whatsapp): void
     {
         $n = WhatsApp::normalizarTelefono($whatsapp);

@@ -17,7 +17,6 @@ declare(strict_types=1);
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit; }
 
 define('RAIZ', dirname(__DIR__));
-date_default_timezone_set('America/Guayaquil');
 
 $envFile = RAIZ . '/config/.env';
 if (is_file($envFile)) {
@@ -25,6 +24,7 @@ if (is_file($envFile)) {
         if (getenv($k) === false) putenv("$k=$v");
     }
 }
+date_default_timezone_set(getenv('TURENTA_ZONA') ?: 'America/Guayaquil');
 spl_autoload_register(function (string $c): void {
     if (str_starts_with($c, 'TuRenta\\') && is_file($f = RAIZ . '/src/' . substr($c, 8) . '.php')) require $f;
 });

@@ -396,6 +396,9 @@ final class Papelera
         'ical' => ['t', 'SELECT id FROM negocios WHERE token_ical = ?'],
         'portal_proveedor' => ['t', 'SELECT negocio_id FROM proveedores WHERE token = ?'],
         'payphone' => ['clientTransactionId', 'SELECT negocio_id FROM pagos WHERE id = ?::bigint'],
+        'reservar' => ['s', 'SELECT id FROM negocios WHERE slug = ?'],
+        'stripe' => ['session_id', "SELECT negocio_id FROM pagos WHERE metodo = 'stripe' AND referencia = ?"],
+        'stripe_webhook' => ['s', 'SELECT id FROM negocios WHERE slug = ?'],
     ];
 
     public function negocioDeRuta(string $ruta, array $get): ?int

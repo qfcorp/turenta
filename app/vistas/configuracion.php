@@ -192,6 +192,80 @@ $num = fn(string $k) => e(rtrim(rtrim(number_format((float) $n[$k], 2, '.', ''),
     <button class="boton" type="submit">Guardar datos de cobro</button>
 </form>
 
+<?php elseif ($tab === 'reserva'):
+    $conStripe = \TuRenta\Stripe::claveValida(trim((string) $n['stripe_secret_key']));
+    $pruebaStripe = str_contains((string) $n['stripe_secret_key'], '_test_');
+    $enlaceReserva = url_completa('reservar', ['s' => $n['slug']]);
+    $enlaceWebhook = url_completa('stripe_webhook', ['s' => $n['slug']]);
+    $hm = fn(string $k) => e(substr((string) $n[$k], 0, 5)); ?>
+<form class="bloque" method="post" action="<?= e(url('configuracion', ['tab' => 'reserva', 'accion' => 'reserva'])) ?>">
+    <?= campo_csrf() ?>
+    <h2>Reserva en línea</h2>
+    <p class="g-nota">Tus clientes eligen un paquete, la fecha y una hora libre, y pagan el depósito o todo con tarjeta. Los paquetes que salen
+        son los que marcas como <strong>«Se reserva en línea»</strong> en Paquetes, con sus equipos (espacios).</p>
+    <div class="casillas" style="margin-bottom:12px"><label><input type="checkbox" name="reserva_en_linea" value="1" <?= $n['reserva_en_linea'] ? 'checked' : '' ?>> Abrir la reserva en línea</label></div>
+    <?php if ($n['reserva_en_linea']): ?>
+        <p class="aviso aviso-ok">Enlace para tus clientes y tu página web: <a href="<?= e($enlaceReserva) ?>" target="_blank" rel="noopener"><?= e($enlaceReserva) ?></a>
+            <br><small>Para abrir un paquete ya elegido, agrega <code>&amp;p=</code> y el nombre corto del paquete (ej. <code>&amp;p=signature-experience</code>).</small></p>
+    <?php endif; ?>
+    <div class="fila-campos">
+        <div class="campo"><label for="idioma_publico">Idioma de las páginas del cliente</label>
+            <select id="idioma_publico" name="idioma_publico">
+                <option value="es" <?= $n['idioma_publico'] !== 'en' ? 'selected' : '' ?>>Español</option>
+                <option value="en" <?= $n['idioma_publico'] === 'en' ? 'selected' : '' ?>>Inglés (negocios de EE.UU.)</option>
+            </select></div>
+        <div class="campo"><label for="reserva_dias_min">Aviso mínimo (días)</label>
+            <input type="number" id="reserva_dias_min" name="reserva_dias_min" min="0" max="60" value="<?= (int) $n['reserva_dias_min'] ?>"></div>
+    </div>
+    <div class="fila-campos">
+        <div class="campo"><label for="reserva_hora_desde">Primera hora de inicio</label>
+            <input type="time" id="reserva_hora_desde" name="reserva_hora_desde" value="<?= $hm('reserva_hora_desde') ?>"></div>
+        <div class="campo"><label for="reserva_hora_hasta">Última hora de inicio</label>
+            <input type="time" id="reserva_hora_hasta" name="reserva_hora_hasta" value="<?= $hm('reserva_hora_hasta') ?>"></div>
+        <div class="campo"><label for="reserva_paso_min">Cada cuántos minutos</label>
+            <input type="number" id="reserva_paso_min" name="reserva_paso_min" min="10" max="240" step="5" value="<?= (int) $n['reserva_paso_min'] ?>"></div>
+    </div>
+    <p class="g-nota">El tiempo de viaje e instalación antes y después de cada fiesta sale de <strong>Reglas → horas de montaje y desmontaje</strong>.
+        El depósito es el <strong>% de reserva</strong> de Reglas.</p>
+    <div class="campo"><label for="reserva_condiciones">Condiciones que acepta el cliente</label>
+        <textarea id="reserva_condiciones" name="reserva_condiciones" rows="5" maxlength="5000" placeholder="Deposit is non-refundable within 7 days of the party. Rain dates…"><?= $f('reserva_condiciones') ?></textarea></div>
+    <div class="fila-campos">
+        <div class="campo"><label for="sitio_externo">Tu página web</label>
+            <input type="url" id="sitio_externo" name="sitio_externo" value="<?= $f('sitio_externo') ?>" placeholder="https://tunegocio.com"></div>
+        <div class="campo"><label for="logo_url">Logo (dirección de la imagen)</label>
+            <input type="url" id="logo_url" name="logo_url" value="<?= $f('logo_url') ?>" placeholder="https://tunegocio.com/logo.webp"></div>
+    </div>
+
+    <h2 style="margin-top:20px">Pago con tarjeta (Stripe)</h2>
+    <?php if ($conStripe): ?>
+        <p class="aviso <?= $pruebaStripe ? 'aviso-error' : 'aviso-ok' ?>"><?= $pruebaStripe
+            ? '🧪 Stripe está en MODO PRUEBA: nadie paga de verdad (tarjeta de prueba 4242 4242 4242 4242). Cambia a las claves «live» para cobrar.'
+            : '✅ Stripe está activo y cobra de verdad.' ?></p>
+    <?php endif; ?>
+    <div class="g-ayuda">
+        <strong>¿Dónde saco estas claves?</strong>
+        <ol>
+            <li>Entra a <strong>dashboard.stripe.com</strong> con la cuenta de Stripe del negocio.</li>
+            <li>Ve a <strong>Developers</strong> (desarrolladores) → <strong>API keys</strong>. Copia la <strong>Secret key</strong> (empieza con <code>sk_test_</code> o <code>sk_live_</code>) y la <strong>Publishable key</strong> (<code>pk_…</code>).</li>
+            <li>Ve a <strong>Developers → Webhooks → Add endpoint</strong> y pega esta dirección: <code><?= e($enlaceWebhook) ?></code></li>
+            <li>Elige los eventos <code>checkout.session.completed</code>, <code>checkout.session.async_payment_succeeded</code> y <code>checkout.session.expired</code>. Guarda y copia el <strong>Signing secret</strong> (<code>whsec_…</code>).</li>
+        </ol>
+        Stripe cobra su comisión por cada pago y deposita en la cuenta bancaria del negocio.
+    </div>
+    <div class="fila-campos">
+        <div class="campo"><label for="stripe_secret_key">Secret key</label>
+            <input type="password" id="stripe_secret_key" name="stripe_secret_key" value="" autocomplete="off" placeholder="<?= $conStripe ? '•••••• (guardada; déjala vacía para no cambiarla)' : 'sk_test_…' ?>"></div>
+        <div class="campo"><label for="stripe_publishable_key">Publishable key</label>
+            <input type="text" id="stripe_publishable_key" name="stripe_publishable_key" value="<?= $f('stripe_publishable_key') ?>" autocomplete="off" placeholder="pk_test_…"></div>
+    </div>
+    <div class="campo"><label for="stripe_webhook_secret">Signing secret del webhook</label>
+        <input type="password" id="stripe_webhook_secret" name="stripe_webhook_secret" value="" autocomplete="off" placeholder="<?= trim((string) $n['stripe_webhook_secret']) !== '' ? '•••••• (guardado)' : 'whsec_…' ?>"></div>
+    <?php if ($conStripe): ?>
+        <div class="casillas" style="margin-bottom:14px"><label><input type="checkbox" name="quitar_stripe" value="1"> Quitar Stripe (dejar de cobrar con tarjeta)</label></div>
+    <?php endif; ?>
+    <button class="boton" type="submit">Guardar reserva en línea y Stripe</button>
+</form>
+
 <?php elseif ($tab === 'pagina'):
     $qr = $qrSvg($enlacePagina);
     $waTexto = 'Conoce ' . $n['nombre'] . ', mira nuestros espacios y consulta tu fecha aquí: ' . $enlacePagina; ?>

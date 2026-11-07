@@ -323,13 +323,18 @@ $pedidos = [
     'portal_extras' => ['t' => $T['token_cliente']], 'encuesta' => ['t' => $T['token_encuesta']], 'puerta' => ['t' => $T['token_puerta']], 'vivo' => ['t' => $T['token_vivo']],
     'invitacion' => ['t' => $T['invitado']], 'ingreso' => ['t' => $T['invitado']], 'staff' => ['t' => $T['personal']], 'ical' => ['t' => $T['ical']],
     'portal_proveedor' => ['t' => $T['proveedor']], 'payphone' => ['clientTransactionId' => 'TE' . $T['pago'] . '-0a1b2c3d'],
+    // TuRenta (migración 200): reserva en línea y Stripe
+    'reservar' => ['s' => $A['slug']], 'stripe_webhook' => ['s' => $A['slug']], 'stripe' => ['session_id' => 'cs_test_papelera0000000000'],
 ];
+$db->exec("INSERT INTO pagos (negocio_id, evento_id, monto, metodo, estado, origen, referencia)
+           SELECT negocio_id, evento_id, 10, 'stripe', 'pendiente', 'stripe', 'cs_test_papelera0000000000' FROM pagos WHERE id = " . (int) $T['pago']);
 $mal = [];
 foreach (Papelera::RUTAS_PUBLICAS as $ruta => $_) {
     if (($pedidos[$ruta] ?? null) === null) { $mal[] = "$ruta sin probar"; continue; }
     if ($pap->negocioDeRuta($ruta, $pedidos[$ruta]) !== $A['id']) $mal[] = $ruta;
 }
 check('Cada página pública encuentra su negocio por su enlace (' . count(Papelera::RUTAS_PUBLICAS) . ')', [], $mal);
+$db->exec("DELETE FROM pagos WHERE referencia = 'cs_test_papelera0000000000'");   // no cambia las filas que se comparan al restaurar
 check('Foto pública de un espacio también', $A['id'], $pap->negocioDeRuta('imagen_publica', ['tipo' => 'espacio', 'id' => (string) $A['espacio']]));
 check('Enlace que no existe o raro: null', [null, null, null], [$pap->negocioDeRuta('portal', ['t' => 'no-existe']), $pap->negocioDeRuta('sitio', ['s' => ['x']]),
                                                                 $pap->negocioDeRuta('login', [])]);

@@ -50,6 +50,27 @@ if (($_GET['contrato'] ?? '') === 'pdf' && modulo_activo($nid, 'contratos')) {
     redirigir('portal', ['t' => $token]);
 }
 
+// TuRenta (migración 200): negocio de EE.UU. -> portal "My Party" en inglés con pago por Stripe
+if (($negocio['idioma_publico'] ?? 'es') === 'en') {
+    $stripe = new \TuRenta\Stripe(db());
+    if (($_GET['pago'] ?? '') === 'cancelado') aviso('You left the card payment page. Nothing was charged — you can try again below.', 'error');
+    $activo = !in_array($ev['estado'], ['perdido', 'cancelado'], true);
+    $paqueteNombre = null;
+    if ($ev['reserva_paquete_id']) {
+        $st = db()->prepare('SELECT nombre FROM paquetes WHERE id = ? AND negocio_id = ?');
+        $st->execute([$ev['reserva_paquete_id'], $nid]);
+        $paqueteNombre = $st->fetchColumn() ?: null;
+    }
+    vista_publica_en('portal_en', [
+        'ev' => $ev, 'negocio' => $negocio, 'token' => $token, 'activo' => $activo, 'res' => $pagos->resumen($eid),
+        'historial' => array_values(array_filter($pagos->pagos($nid, $eid), fn($p) => in_array($p['estado'], ['confirmado', 'por_revisar', 'rechazado'], true))),
+        'stripeListo' => $stripe->listo($nid), 'stripePrueba' => $stripe->modoPrueba($nid), 'montos' => (new \TuRenta\Reservas(db()))->montos($eid),
+        'paqueteNombre' => $paqueteNombre, 'primerNombre' => trim(explode(' ', trim((string) $ev['cliente']))[0]),
+    ], 'My party · ' . $negocio['nombre'], ['nombre' => $negocio['nombre'], 'color' => $negocio['color'], 'logo_url' => $negocio['logo_url'],
+                                            'sitio_externo' => $negocio['sitio_externo'], 'telefono' => $negocio['telefono'] ?: $negocio['whatsapp']]);
+    return;
+}
+
 $mod = [];
 foreach (['contratos', 'invitados', 'dia_evento', 'boda_vivo'] as $m) $mod[$m] = modulo_activo($nid, $m);
 $activo = !in_array($ev['estado'], ['perdido', 'cancelado'], true);

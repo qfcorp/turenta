@@ -16,6 +16,26 @@ if (!$ev) {
 if (!es_post()) {
     redirigir('portal', ['t' => $token]);
 }
+// TuRenta (migración 200): pago con tarjeta por Stripe Checkout (depósito o todo lo que falta). El valor lo calcula el servidor.
+if (($_GET['accion'] ?? '') === 'stripe') {
+    verificar_csrf_en();
+    try {
+        $m = (new \TuRenta\Reservas(db()))->montos((int) $ev['id']);
+        $opcion = (string) ($_POST['opcion'] ?? 'total');
+        $monto = $opcion === 'deposito' && $m['deposito'] > 0 ? $m['deposito'] : $m['total'];
+        if ($monto <= 0) throw new RuntimeException('Nothing left to pay. Thank you!');
+        $pagado = (new Pagos(db()))->resumen((int) $ev['id'])['pagado'];
+        $concepto = $opcion === 'deposito' && $m['deposito'] > 0 && $m['deposito'] < $m['total'] ? 'Deposit' : ($pagado > 0 ? 'Balance' : 'Full payment');
+        $urlStripe = (new \TuRenta\Stripe(db()))->crearCheckout((int) $ev['id'], $monto, $concepto, url_completa('stripe'),
+                                                                url_completa('portal', ['t' => $token, 'pago' => 'cancelado']), $ev['cliente_email'] ?: null);
+        header('Location: ' . $urlStripe, true, 303);
+        exit;
+    } catch (RuntimeException $e) {
+        aviso($e->getMessage(), 'error');
+        header('Location: ' . url('portal', ['t' => $token]) . '#pay');
+        exit;
+    }
+}
 verificar_csrf();
 $st = db()->prepare('SELECT nombre, color, slug, logo FROM negocios WHERE id = ?');
 $st->execute([$ev['negocio_id']]);

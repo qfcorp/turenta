@@ -44,6 +44,8 @@ array_push($publicas, 'portal_cuestionario', 'portal_extras', 'encuesta');
 array_push($privadas, 'evento_formulario', 'cuestionarios', 'extras');
 $deCoordinador[] = 'evento_formulario';   // el coordinador ve las respuestas del formulario (útil el día del evento)
 $publicas[] = 'firmar_anexo';             // anexo de contrato por extras aprobados (migración 090)
+// TuRenta (migración 200): reserva en línea en inglés y cobro con Stripe (regreso del cliente y aviso de Stripe)
+array_push($publicas, 'reservar', 'stripe', 'stripe_webhook');
 // Proveedores y compras (migración 060): portal del proveedor, verificación de la orden de compra, ficha, compras, por pagar e incidencias
 array_push($publicas, 'portal_proveedor', 'verificar_oc');
 array_push($privadas, 'proveedor', 'compras', 'compra', 'por_pagar', 'incidencias', 'proveedor_archivo');
@@ -129,7 +131,7 @@ try {
 } catch (Throwable $e) {
     error_log('TuRenta: ' . $e->getMessage() . ' en ' . $e->getFile() . ':' . $e->getLine());
     if (!headers_sent()) http_response_code(500);
-    if (in_array($ruta, ['disponible', 'buscar'], true)) {
+    if (in_array($ruta, ['disponible', 'buscar', 'stripe_webhook'], true)) {
         header('Content-Type: application/json');
         echo json_encode(['error' => true]);
     } elseif (in_array($ruta, $publicas, true)) {

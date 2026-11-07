@@ -1,0 +1,11 @@
+{
+    "name": "qfcorp/turenta",
+    "description": "TuRenta — programa para salones de eventos, quintas y haciendas (Tukán Software)",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.3",
+        "tecnickcom/tcpdf": "^6.6"
+    },
+    "config": { "optimize-autoloader": true }
+}

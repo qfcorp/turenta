@@ -1,0 +1,69 @@
+/* Programa modular (Anexo B): Mi plan, página de módulo apagado, pedido de demo y módulos en el Panel Tukán */
+
+/* Interruptor (checkbox con forma de switch) */
+.interruptor { appearance: none; -webkit-appearance: none; flex: none; width: 42px; height: 24px; border-radius: 999px; background: #CFC4C6;
+    position: relative; cursor: pointer; transition: background .15s; margin: 2px 0 0; }
+.interruptor::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .15s; }
+.interruptor:checked { background: var(--verde); }
+.interruptor:checked::after { transform: translateX(18px); }
+.interruptor:focus-visible { outline: 3px solid var(--navaja); outline-offset: 2px; }
+
+/* Módulo apagado */
+.mod-apagado-etq { display: inline-block; margin: 0 0 10px; padding: 4px 12px; border-radius: 999px; background: var(--verde-claro); color: var(--verde-oscuro); font-weight: 600; }
+.mod-apagado-precio { font-size: 1.05rem; }
+
+/* Pedido de demo: módulos que le interesan */
+.mod-elegir-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+.mod-elegir-item { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border: 1px solid var(--linea); border-radius: 8px; background: var(--superficie); font-size: .92rem; cursor: pointer; }
+.mod-elegir-item input { margin-top: 3px; }
+
+/* Mi plan */
+.mp-resumen { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+.mp-precio { font-size: 1.8rem; font-weight: 700; line-height: 1.1; margin: 0; }
+.mp-precio small { font-size: .9rem; font-weight: 500; color: var(--tinta-suave); }
+.mp-desglose { list-style: none; margin: 8px 0 0; padding: 0; font-size: .9rem; color: var(--tinta-suave); }
+.mp-desglose li { display: inline; }
+.mp-desglose li + li::before { content: " · "; }
+.mp-grupo { margin-top: 18px; }
+.mp-grupo h3 { margin: 0 0 8px; font-size: .95rem; color: var(--tinta-suave); text-transform: uppercase; letter-spacing: .03em; }
+.mp-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 10px; }
+.mp-mod { display: flex; flex-direction: column; gap: 6px; padding: 14px; border: 1px solid var(--linea); border-radius: var(--radio); background: var(--superficie); scroll-margin-top: 16px; }
+.mp-mod.on { border-color: #B9D9C2; background: #F7FBF8; }
+.mp-mod:target { box-shadow: 0 0 0 3px var(--navaja); }
+.mp-mod-cab { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; }
+.mp-mod-cab h4 { margin: 0; font-size: 1rem; }
+.mp-mod p { margin: 0; font-size: .9rem; color: var(--tinta-suave); }
+.mp-mod-pie { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 6px; }
+.mp-mod-pie form { margin: 0; }
+.mp-estado { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .78rem; font-weight: 600; white-space: nowrap; }
+.mp-estado.on { background: var(--ok-claro); color: #1C5A31; }
+.mp-estado.off { background: #EEF1F0; color: var(--tinta-suave); }
+.mp-estado.pedido { background: #FBF0D3; color: #6A4D0D; }
+.mp-mod-precio { font-weight: 700; white-space: nowrap; }
+.mp-base { columns: 2 260px; margin: 8px 0 0; padding-left: 20px; font-size: .92rem; }
+.mp-base li { break-inside: avoid; margin-bottom: 4px; }
+.mp-planes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 10px; }
+.mp-plan { padding: 14px; border: 1px solid var(--linea); border-radius: var(--radio); background: var(--superficie); }
+.mp-plan.actual { border-color: var(--verde); box-shadow: inset 0 0 0 1px var(--verde); }
+.mp-plan h3 { margin: 0; font-size: 1.05rem; }
+.mp-plan p { margin: 4px 0 0; font-size: .88rem; color: var(--tinta-suave); }
+
+/* Panel Tukán: módulos de un negocio */
+.adm-mod-total { font-size: 1.05rem; }
+.adm-mod-grupos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 12px; margin: 10px 0 14px; }
+.adm-mod-grupo { border: 1px solid var(--linea); border-radius: var(--radio); padding: 8px 12px 10px; margin: 0; min-width: 0; }
+.adm-mod-grupo legend { padding: 0 6px; font-weight: 600; font-size: .9rem; color: var(--tinta-suave); }
+.adm-mod-item { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-bottom: 1px dashed var(--linea); cursor: pointer; }
+.adm-mod-item:last-child { border-bottom: 0; }
+.adm-mod-nombre { font-size: .93rem; line-height: 1.3; min-width: 0; }
+.adm-mod-nombre small { display: block; color: var(--tinta-suave); font-size: .8rem; }
+.adm-mod-cuenta { list-style: none; padding: 0; margin: 0 0 12px; max-width: 360px; }
+.adm-mod-cuenta li { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+.adm-mod-cuenta li.total { border-top: 1px solid var(--linea); font-weight: 700; margin-top: 4px; padding-top: 6px; }
+.adm-mod-pedidos { display: grid; gap: 8px; margin: 10px 0; }
+.adm-mod-pedido { padding: 10px 12px; border-radius: 8px; background: #FBF0D3; }
+.adm-mod-pedido p { margin: 0 0 6px; }
+.adm-cat-tabla input[type=text], .adm-cat-tabla input[type=number] { width: 100%; min-width: 0; }
+.adm-cat-tabla td { vertical-align: top; }
+.adm-cat-planes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 12px; }

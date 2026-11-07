@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="es-EC">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual de TuRenta</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Si no hay internet, se usan las fuentes guardadas en el repositorio */
+@font-face { font-family: "Space Grotesk"; font-weight: 500 700; src: local("Space Grotesk"), url("../primeros_pasos/fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 400; src: local("DM Sans"), url("../primeros_pasos/fonts/dm-sans-latin-400-normal.woff2") format("woff2"); }
+:root { --marino: #14213D; --marino-2: #22315A; --amarillo: #FFC93C; --naranja: #FF8A1F; --agua: #2A9D8F; --tinta: #1C2333; --suave: #5B6478;
+        --linea: #DDE1EA; --fondo: #F4F5F8; --consejo: #EAF6EE; --consejo-borde: #2E9B57; --ojo: #FFF2E6; }
+@page { size: A4; margin: 16mm 15mm 18mm 15mm; }
+@page portada { margin: 0; }
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font-family: "DM Sans", system-ui, sans-serif; font-size: 10.4pt; line-height: 1.5; color: var(--tinta); background: #fff; }
+h1, h2, h3 { font-family: "Space Grotesk", "DM Sans", sans-serif; color: var(--marino); line-height: 1.2; }
+p { margin: 0 0 7px; }
+.portada { page: portada; width: 210mm; height: 297mm; background: var(--marino); color: #fff; position: relative; overflow: hidden; padding: 26mm 20mm; display: flex; flex-direction: column; break-after: page; }
+.portada .marca { font-family: "Space Grotesk"; font-size: 15pt; font-weight: 700; letter-spacing: .5px; }
+.portada .marca i { color: var(--amarillo); font-style: normal; }
+.portada .marca small { display: block; font-family: "DM Sans"; font-weight: 400; font-size: 9.5pt; opacity: .75; }
+.portada h1 { color: #fff; font-size: 46pt; margin: 30mm 0 4mm; letter-spacing: -1px; }
+.portada h1 em { font-style: normal; color: var(--amarillo); }
+.portada .raya { width: 46mm; height: 5px; background: var(--amarillo); border-radius: 3px; margin-bottom: 8mm; }
+.portada .bajada { font-size: 13.5pt; max-width: 98mm; opacity: .92; line-height: 1.45; }
+.portada .lema { max-width: 92mm; margin-top: 6mm; color: var(--amarillo); font-weight: 700; font-size: 12pt; }
+.portada .telefonos { position: absolute; right: 14mm; bottom: 30mm; display: flex; gap: 6mm; align-items: flex-end; }
+.portada .telefonos img { width: 52mm; height: 112mm; object-fit: cover; object-position: top; border: 7px solid #0A1530; border-radius: 26px; box-shadow: 0 14px 40px rgba(0,0,0,.45); background: #fff; }
+.portada .telefonos img + img { width: 46mm; height: 99mm; margin-bottom: 14mm; }
+.portada .pie { margin-top: auto; font-size: 9.5pt; opacity: .85; line-height: 1.6; max-width: 66mm; }
+.portada .pie b { color: var(--amarillo); }
+.portada .franja { position: absolute; left: 0; right: 0; bottom: 0; height: 9mm; background: linear-gradient(90deg, var(--amarillo) 0 70%, var(--naranja) 70%); }
+.indice { break-after: page; }
+.indice h1 { font-size: 22pt; margin: 0 0 4mm; }
+.intro-caja { background: var(--fondo); border-radius: 10px; padding: 10px 14px; margin-bottom: 5mm; font-size: 10pt; }
+.indice ol { list-style: none; padding: 0; margin: 0; }
+.indice li { display: flex; align-items: baseline; gap: 10px; padding: 1.5px 0; border-bottom: 1px solid var(--linea); }
+.indice li .n { font-family: "Space Grotesk"; font-weight: 700; color: #fff; background: var(--marino); border-radius: 6px; padding: 1px 7px; font-size: 9pt; min-width: 26px; text-align: center; }
+.indice li a { text-decoration: none; color: var(--tinta); font-weight: 700; flex: 1; }
+.indice li small { display: block; font-weight: 400; color: var(--suave); font-size: 8.4pt; line-height: 1.3; }
+.indice li .pag { font-family: "Space Grotesk"; color: var(--marino); font-weight: 700; min-width: 18px; text-align: right; }
+section.cap { break-before: page; }
+section.cap > h1 { font-size: 21pt; margin: 0 0 3mm; padding-bottom: 3mm; border-bottom: 4px solid var(--amarillo); display: flex; align-items: center; gap: 10px; }
+section.cap > h1 .num { background: var(--marino); color: var(--amarillo); border-radius: 8px; padding: 2px 9px; font-size: 15pt; }
+.plan { display: inline-block; font-size: 8.6pt; color: var(--marino); background: #E8ECF5; border-radius: 999px; padding: 2px 10px; margin: 0 0 4mm; }
+.plan::before { content: "◆ "; color: var(--naranja); }
+h2 { font-size: 13.5pt; margin: 6mm 0 2.5mm; break-after: avoid; }
+h3 { font-size: 11pt; margin: 4mm 0 2mm; break-after: avoid; }
+.tarea { display: grid; grid-template-columns: 1fr 50mm; gap: 7mm; align-items: start; break-inside: avoid; margin-bottom: 4mm; }
+.tarea > div > h2:first-child { margin-top: 0; }
+ol.pasos { list-style: none; counter-reset: paso; padding: 0; margin: 0 0 3mm; }
+ol.pasos > li { counter-increment: paso; position: relative; padding: 0 0 0 30px; margin: 0 0 6px; min-height: 22px; }
+ol.pasos > li::before { content: counter(paso); position: absolute; left: 0; top: 0; width: 21px; height: 21px; border-radius: 50%; background: var(--amarillo); color: var(--marino); font-weight: 700; font-size: 9.5pt; display: flex; align-items: center; justify-content: center; }
+ul.lista { margin: 0 0 3mm; padding-left: 18px; } ul.lista li { margin-bottom: 3px; }
+figure { margin: 0 0 4mm; break-inside: avoid; }
+figcaption { font-size: 8.4pt; color: var(--suave); text-align: center; margin-top: 2mm; }
+figure.cel img { width: 100%; max-height: 106mm; object-fit: cover; object-position: top; display: block; border: 6px solid #10192F; border-radius: 22px; box-shadow: 0 6px 16px rgba(20,33,61,.18); background: #fff; }
+figure.pc img { width: 100%; max-height: 118mm; object-fit: cover; object-position: top; display: block; border: 1px solid var(--linea); border-radius: 8px; box-shadow: 0 6px 18px rgba(20,33,61,.12); }
+figure.pc.m100 img { max-height: 100mm; } figure.pc.m90 img { max-height: 90mm; } figure.pc.m80 img { max-height: 80mm; } figure.pc.m70 img { max-height: 70mm; }
+.dos-cel { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; padding: 0 18mm; break-inside: avoid; }
+.consejo, .ojo, .nota { border-radius: 9px; padding: 8px 12px; margin: 0 0 4mm; font-size: 9.8pt; break-inside: avoid; }
+.consejo { background: var(--consejo); border-left: 5px solid var(--consejo-borde); }
+.ojo { background: var(--ojo); border-left: 5px solid var(--naranja); }
+.nota { background: var(--fondo); border-left: 5px solid var(--marino); }
+.consejo > b:first-child, .ojo > b:first-child, .nota > b:first-child { display: block; font-family: "Space Grotesk"; font-size: 9.5pt; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 2px; }
+.consejo > b:first-child { color: var(--consejo-borde); } .ojo > b:first-child { color: #C25A0C; } .nota > b:first-child { color: var(--marino); }
+table.t { width: 100%; border-collapse: collapse; margin: 0 0 4mm; font-size: 9.2pt; }
+table.t tr { break-inside: avoid; }
+table.t th { background: var(--marino); color: #fff; text-align: left; padding: 5px 8px; font-weight: 700; }
+table.t td { padding: 4px 8px; border-bottom: 1px solid var(--linea); vertical-align: top; }
+table.t tr:nth-child(even) td { background: #FAFBFD; }
+.si { color: #2E9B57; font-weight: 700; } .no { color: #B23A3A; }
+.faq h3 { margin: 4mm 0 1mm; font-size: 10.6pt; }
+.faq p { margin-bottom: 2mm; }
+.contacto { background: var(--marino); color: #fff; border-radius: 12px; padding: 12px 16px; margin-top: 6mm; break-inside: avoid; }
+.contacto b { color: var(--amarillo); }
+</style>
+</head>
+<body>
+
+<div class="portada">
+  <div class="marca">tukán<i>.</i><small>Sistemas que trabajan por tu negocio</small></div>
+  <h1>Manual de <em>TuRenta</em></h1>
+  <div class="raya"></div>
+  <p class="bajada">Las fechas, las cotizaciones, los contratos y los cobros de tu salón de eventos, quinta o hacienda, y todo lo del día del evento: cronograma, personal, proveedores e invitados.</p>
+  <p class="lema">Todo es por módulos: eliges lo que necesitas y pagas solo por eso.</p>
+  <div class="telefonos"><img src="capturas/15_portal_celular.png" alt=""><img src="capturas/03_inicio_celular.png" alt=""></div>
+  <p class="pie">Capturas reales del local de ejemplo <b>Quinta Demo Tukanec</b>.<br>WhatsApp de Tukán <b>098 366 2181</b><br>info@tukansoftware.com · tukansoftware.com</p>
+  <div class="franja"></div>
+</div>
+
+<div class="indice">
+  <h1>Contenido</h1>
+  <div class="intro-caja"><b>Cómo leer este manual.</b> Cada capítulo es una parte de TuRenta. Arriba de cada uno dice si es de la <b>base</b> (la tienen todos los locales) o de un <b>módulo</b> (se enciende en <i>Mi plan</i>). Si un módulo no está en tu plan, su pantalla dice «Este módulo no está en tu plan» y te deja pedirlo. Lo que ves también depende de tu cargo: dueño, administrador, vendedor, coordinador o solo consulta. Cuando el manual dice «solo el dueño», vale también para los administradores (tienen el mismo nivel).</div>
+  <ol>
+    <li><span class="n">1</span><a href="#c1">Qué es TuRenta y cómo se arma<small>La base, los módulos y los planes</small></a><span class="pag" data-pag="c1"></span></li>
+    <li><span class="n">2</span><a href="#c2">Entrar y la pantalla de Inicio<small>El menú, la guía de primeros pasos y las cifras del día</small></a><span class="pag" data-pag="c2"></span></li>
+    <li><span class="n">3</span><a href="#c3">Tu equipo: qué ve cada cargo<small>Dueño, administradores, vendedor, coordinador y solo consulta · usuarios</small></a><span class="pag" data-pag="c3"></span></li>
+    <li><span class="n">4</span><a href="#c4">Configuración del negocio y reglas<small>Datos, logo, reglas, cobros, página pública y tareas</small></a><span class="pag" data-pag="c4"></span></li>
+    <li><span class="n">5</span><a href="#c5">Espacios, fechas cerradas y planos<small>Salones y jardines que nunca se venden dos veces</small></a><span class="pag" data-pag="c5"></span></li>
+    <li><span class="n">6</span><a href="#c6">Catálogo, paquetes y extras<small>Los precios que ve tu cliente</small></a><span class="pag" data-pag="c6"></span></li>
+    <li><span class="n">7</span><a href="#c7">El calendario y un evento nuevo<small>Consulta, estados y sin doble reserva</small></a><span class="pag" data-pag="c7"></span></li>
+    <li><span class="n">8</span><a href="#c8">Un evento por dentro<small>Resumen, tareas, dinero y coordinador del día</small></a><span class="pag" data-pag="c8"></span></li>
+    <li><span class="n">9</span><a href="#c9">Seguimiento, clientes y mensajes por WhatsApp<small>Y las consultas de tu página pública</small></a><span class="pag" data-pag="c9"></span></li>
+    <li><span class="n">10</span><a href="#c10">La cotización<small>Armar, enviar y que el cliente la acepte</small></a><span class="pag" data-pag="c10"></span></li>
+    <li><span class="n">11</span><a href="#c11">El contrato con firma en el celular<small>Módulo · plantillas, firma y verificación</small></a><span class="pag" data-pag="c11"></span></li>
+    <li><span class="n">12</span><a href="#c12">Pagos y cobros<small>Plan de cuotas, recibos, comprobantes y garantía</small></a><span class="pag" data-pag="c12"></span></li>
+    <li><span class="n">13</span><a href="#c13">El portal del cliente<small>Módulos · formulario, extras y encuesta</small></a><span class="pag" data-pag="c13"></span></li>
+    <li><span class="n">14</span><a href="#c14">El día del evento<small>Módulo · cronograma en vivo, personal, mobiliario</small></a><span class="pag" data-pag="c14"></span></li>
+    <li><span class="n">15</span><a href="#c15">Invitados con QR y plano del salón<small>Módulos · lista, mesas, invitación y puerta</small></a><span class="pag" data-pag="c15"></span></li>
+    <li><span class="n">16</span><a href="#c16">Proveedores y compras<small>Módulos · órdenes, facturas, por pagar y puntaje</small></a><span class="pag" data-pag="c16"></span></li>
+    <li><span class="n">17</span><a href="#c17">Reportes y metas<small>Ventas, cobros, ocupación, ganancia y satisfacción</small></a><span class="pag" data-pag="c17"></span></li>
+    <li><span class="n">18</span><a href="#c18">Mi plan, módulos y demos<small>Lo que tienes y cómo pedir más</small></a><span class="pag" data-pag="c18"></span></li>
+    <li><span class="n">19</span><a href="#c19">Ayuda e inteligencia artificial<small>«¿Qué necesita hacer?» · módulo Asistente IA: cotización desde un mensaje</small></a><span class="pag" data-pag="c19"></span></li>
+    <li><span class="n">20</span><a href="#c20">Preguntas frecuentes<small>Y cómo pedir ayuda</small></a><span class="pag" data-pag="c20"></span></li>
+  </ol>
+</div>
+
+<section class="cap" id="c1">
+  <h1><span class="num">1</span> Qué es TuRenta y cómo se arma</h1>
+  <p>TuRenta es el sistema para <b>salones de eventos, quintas y haciendas</b> de Ecuador. Funciona en el celular, la tablet y la computadora, sin instalar nada: entras con tu correo y tu contraseña desde el navegador. Lleva cada evento desde que el cliente pregunta por una fecha hasta el día de la fiesta y después.</p>
+  <h2>La base (la tienen todos)</h2>
+  <ul class="lista">
+    <li><b>Calendario sin doble reserva</b> (lo impide el sistema) y la vista de <b>próximos sábados</b>.</li>
+    <li>Eventos con estados, seguimiento, tareas y lista de espera · clientes con su historial.</li>
+    <li>Espacios, fechas cerradas y catálogo de productos con precios.</li>
+    <li><b>Cotizaciones</b> con IVA, descuento y versiones, en PDF con QR y con enlace para que el cliente la acepte.</li>
+    <li>Plan de pagos, cuotas, recibos en PDF y comprobantes · mensajes de WhatsApp del día listos para enviar.</li>
+    <li>Página pública del local con «¿Está libre tu fecha?» y formulario de consulta.</li>
+    <li>Reportes de ventas, cobros, por cobrar y ocupación · usuarios con cargos y avisos · app instalable en el celular.</li>
+  </ul>
+  <h2>Los módulos (se encienden o se apagan)</h2>
+  <table class="t">
+    <tr><th style="width:36%">Módulo</th><th>Para qué sirve</th></tr>
+    <tr><td>🎁 Paquetes y simulador</td><td>Paquetes armados (Boda Oro, Quince años…) que cargan la cotización en un toque, con simulador por número de invitados</td></tr>
+    <tr><td>✍️ Contratos con firma</td><td>Contrato con tu plantilla que el cliente firma con el dedo en su celular, con QR de verificación y anexos por extras</td></tr>
+    <tr><td>📱 Portal del cliente</td><td>Un enlace propio del cliente, sin claves: sus pagos, su contrato, sus invitados y los comprobantes que sube</td></tr>
+    <tr><td>💳 Cobros en línea (Payphone)</td><td>El cliente paga sus cuotas con tarjeta desde el portal (necesita el Portal del cliente)</td></tr>
+    <tr><td>📝 Formulario, extras y encuesta</td><td>Formulario del evento, extras pedidos en línea y encuesta de satisfacción (necesita el Portal del cliente)</td></tr>
+    <tr><td>⏱️ Día del evento</td><td>Cronograma con modo en vivo, personal con su propio enlace y hoja del evento en PDF</td></tr>
+    <tr><td>🎟️ Invitados con QR</td><td>Lista, mesas, invitación digital con confirmación y control de ingreso con QR en la puerta</td></tr>
+    <tr><td>🗺️ Plano del salón</td><td>Plano de cada espacio y de cada evento, unido a las mesas de los invitados</td></tr>
+    <tr><td>🪑 Mobiliario y menaje</td><td>Sillas, mesas, mantelería y vajilla: cuánto se reserva, si alcanza y cuánto cobrar por lo dañado</td></tr>
+    <tr><td>🎥 Boda en vivo</td><td>Transmisión con el botón «Ver en vivo» en el portal y en la invitación (necesita Día del evento)</td></tr>
+    <tr><td>🚚 Proveedores y compras</td><td>Ficha del proveedor, órdenes de compra, facturas (también del XML del SRI), pagos y cuentas por pagar</td></tr>
+    <tr><td>🔗 Portal del proveedor</td><td>Cada proveedor ve sus eventos, confirma órdenes, sube facturas y ve sus pagos (necesita Proveedores)</td></tr>
+    <tr><td>⭐ Incidencias y puntaje de proveedores</td><td>Problemas de cada evento con foto, puntualidad y puntaje que tú configuras (necesita Proveedores)</td></tr>
+    <tr><td>🎯 Metas y reportes avanzados</td><td>Metas de ventas del local y por vendedor, embudo, ganancia por evento y comisiones</td></tr>
+    <tr><td>📲 Avisos por Telegram</td><td>Pagos, firmas, consultas nuevas, cuotas y seguimientos llegan solos al celular del equipo</td></tr>
+    <tr><td>📤 Exportar a Excel y Google Calendar</td><td>Descargas para Excel y tus eventos en Google Calendar</td></tr>
+    <tr><td>✨ Asistente IA <small>(incluido en Completo; en el Básico, se pide aparte)</small></td><td>Pegas el mensaje de WhatsApp del cliente y te propone el evento y la cotización con tu catálogo (capítulo 19)</td></tr>
+  </table>
+  <div class="nota"><b>Planes</b><b>Básico</b> = la base + <b>3 módulos que tú eliges</b> (1 espacio y 2 usuarios); si necesitas más, se suman a tu plan. <b>Completo</b> = todos los módulos, con el <b>Asistente IA</b> incluido, sin límite de espacios ni de usuarios. Tukán te hace la cotización por WhatsApp según lo que necesita tu local.</div>
+  <div class="consejo"><b>Apagar no borra</b>Si un módulo se apaga, sus datos quedan guardados. Al encenderlo otra vez, todo vuelve como estaba.</div>
+</section>
+
+<section class="cap" id="c2">
+  <h1><span class="num">2</span> Entrar y la pantalla de Inicio</h1>
+  <span class="plan">Base</span>
+  <div class="tarea">
+    <div>
+      <h2>Entrar</h2>
+      <ol class="pasos">
+        <li>Abre en el navegador la dirección de TuRenta que te mandó Tukán.</li>
+        <li>Escribe tu <b>Correo</b> y tu <b>Contraseña</b> y toca <b>Entrar</b>.</li>
+        <li>La primera vez entras con una contraseña temporal: cámbiala por una tuya en <b>Mi cuenta → Cambiar mi contraseña</b>.</li>
+      </ol>
+      <p>Quien todavía no tiene cuenta ve el enlace <b>Solicitar demo</b>.</p>
+      <h2>El menú</h2>
+      <ul class="lista">
+        <li><b>En la computadora</b>, el menú está a la izquierda: Inicio, Calendario, Eventos, Cobros y, debajo, todas las demás secciones. Arriba tienes el buscador <b>«Buscar evento o cliente…»</b>.</li>
+        <li><b>En el celular</b>, los botones principales están abajo: <b>Inicio, Calendario, Eventos, Cobros y Más</b>. En <b>Más</b> está todo lo demás.</li>
+      </ul>
+    </div>
+    <figure class="cel"><img src="capturas/01_login_celular.png" alt=""><figcaption>La pantalla para entrar.</figcaption></figure>
+  </div>
+  <figure class="pc"><img src="capturas/02_inicio_compu.png" alt=""><figcaption>Inicio con la guía «Primeros pasos», el aviso de un comprobante por revisar y las cifras del día.</figcaption></figure>
+  <h2>Primeros pasos</h2>
+  <p>Al empezar, el Inicio te muestra una guía que se va tachando sola: <b>Completa los datos de tu negocio</b>, <b>Sube tu logo</b>, <b>Revisa tus espacios y precios</b>, <b>Crea tu primer evento</b> y <b>Conecta tu Telegram</b>. Cada paso tiene su botón <b>Hacerlo</b>. Cuando ya no la necesites, toca <b>Ya sé usarlo, ocultar</b>.</p>
+  <div class="tarea">
+    <div>
+      <h2>Qué te muestra el Inicio</h2>
+      <ul class="lista">
+        <li>Botones rápidos: <b>Nuevo evento</b>, <b>Calendario</b> y <b>Cobros</b>.</li>
+        <li>Cifras: eventos de este mes y de los próximos 30 días, lo <b>vencido por cobrar</b>, los <b>comprobantes por revisar</b>, los pagos a proveedores y las <b>consultas nuevas sin atender</b>.</li>
+        <li>La <b>meta del mes</b> y cuánto te falta (módulo Metas).</li>
+        <li><b>Próximos 7 días</b>, <b>Avisos sin leer</b>, <b>Seguimientos de hoy</b>, <b>Tareas por vencer</b>, <b>Cuotas vencidas o por vencer</b> (con el botón de WhatsApp) y <b>Para atender</b> (consultas nuevas).</li>
+      </ul>
+      <div class="consejo"><b>Consejo</b>Instala TuRenta como app: en el Inicio toca <b>Instalar</b> (si tu navegador lo ofrece) o, en Chrome, menú ⋮ → «Agregar a la pantalla principal». Se abre con su ícono, a pantalla completa.</div>
+    </div>
+    <figure class="cel"><img src="capturas/03_inicio_celular.png" alt=""><figcaption>Las cifras y la meta del mes en el celular.</figcaption></figure>
+  </div>
+</section>
+
+<section class="cap" id="c3">
+  <h1><span class="num">3</span> Tu equipo: qué ve cada cargo</h1>
+  <span class="plan">Base</span>
+  <p>Cada persona entra con <b>su propio correo y su contraseña</b>. Lo que ve depende de su cargo:</p>
+  <table class="t">
+    <tr><th style="width:18%">Cargo</th><th>Qué puede hacer</th><th style="width:30%">Qué no ve</th></tr>
+    <tr><td><b>Dueño</b></td><td>Todo: eventos, cotizaciones, contratos, cobros, reportes y metas, configuración, plantillas, formularios del evento, usuarios y Mi plan. Ve la ganancia de cada cotización.</td><td>—</td></tr>
+    <tr><td><b>Administrador</b></td><td>Lo mismo que el dueño, sin excepción: menú completo, usuarios, configuración, Mi plan, metas y dinero (ve la ganancia). Crea, cambia y desactiva a otros administradores y al resto del equipo. Puedes tener hasta <b>4</b> y <b>no cuentan</b> en el límite de usuarios de tu plan.</td><td>No puede cambiar ni desactivar al dueño, ni cambiarse o desactivarse a sí mismo.</td></tr>
+    <tr><td><b>Vendedor</b></td><td>Atiende consultas, cotiza, hace contratos y registra cobros. Ve clientes, seguimiento, mensajes, catálogo, paquetes, proveedores, por pagar y reportes.</td><td>Configuración, plantillas, usuarios, Mi plan, metas y la ganancia de las cotizaciones.</td></tr>
+    <tr><td><b>Coordinador</b></td><td>Ve los eventos y organiza el día: cronograma, personal, proveedores, invitados, mobiliario, plano y las respuestas del formulario. Le llega un aviso cuando le asignan un evento.</td><td>El dinero: no tiene Cobros, ni las pestañas Cotización, Contrato y Pagos.</td></tr>
+    <tr><td><b>Solo consulta</b></td><td>Ve todo (eventos, cobros, reportes). Ideal para el contador o un socio.</td><td>No puede cambiar nada.</td></tr>
+  </table>
+  <div class="tarea">
+    <div>
+      <h2>Agregar a alguien</h2>
+      <ol class="pasos">
+        <li>Ve a <b>Más → Usuarios</b> (el dueño o un administrador).</li>
+        <li>En <b>Agregar a alguien</b> escribe el <b>Nombre</b>, el <b>Correo</b> (con ese entra) y el <b>Celular</b>.</li>
+        <li>Elige <b>¿Qué va a hacer?</b>: <b>Administrador (mismos permisos que el dueño)</b>, Vendedor, Coordinador o Solo consulta, y toca <b>Crear usuario</b>.</li>
+        <li>El sistema crea una <b>contraseña temporal</b> y te la muestra: mándasela con <b>Enviar por WhatsApp</b>.</li>
+      </ol>
+      <p>En cada persona puedes <b>Cambiar</b> su cargo, darle una <b>Nueva contraseña</b> o <b>Desactivar</b> su acceso.</p>
+      <div class="nota"><b>Cuántos usuarios</b>El Básico permite 2 (contándote a ti; los administradores no cuentan). El Completo no tiene límite.</div>
+      <div class="nota"><b>Administradores</b>Arriba de la lista dice cuántos llevas, por ejemplo «Administradores: 2 de 4». Puedes tener hasta 4 además del dueño; si intentas crear o activar un quinto, el sistema avisa «Puede tener hasta 4 administradores además del dueño». Si un administrador pasa a vendedor, coordinador o consulta, empieza a contar en el plan.</div>
+      <div class="nota"><b>Lo que es solo del dueño</b>La cuenta del dueño es la que está registrada en Tukán: es el contacto del negocio en Tukán (a él le escribimos por el plan y los pagos y solo a él le damos una nueva contraseña desde Tukán). Nadie, ni un administrador, puede cambiarla ni desactivarla desde Usuarios.</div>
+
+    </div>
+    <figure class="cel"><img src="capturas/35_coordinador_celular.png" alt=""><figcaption>La coordinadora ve el día del evento; abajo no tiene Cobros.</figcaption></figure>
+  </div>
+  <figure class="pc"><img src="capturas/32_usuarios.png" alt=""><figcaption>Usuarios: el equipo con su cargo, el contador «Administradores: 1 de 4» y el formulario «Agregar a alguien».</figcaption></figure>
+  <h2>Mi cuenta</h2>
+      <p>Cada persona, en <b>Más → Mi cuenta</b>, cambia su nombre y celular (<b>Guardar mis datos</b>) y su contraseña (<b>Cambiar contraseña</b>). Con el módulo <b>Avisos por Telegram</b>, ahí también conecta su Telegram para recibir al instante los pagos, firmas, consultas nuevas y su lista de seguimientos de cada mañana.</p>
+      <p><b>Borrar mi cuenta:</b> al final de Mi cuenta, <b>Pedir que borren mi cuenta</b> abre un correo listo para info@tukansoftware.com. Si eres el dueño, se borra la cuenta del negocio y todos sus datos en un máximo de 15 días (solo se guarda lo que la ley obliga, como contratos y registros de pagos); si eres parte del equipo, el dueño también puede desactivarte en Usuarios.</p>
+  <h2>La app de Android</h2>
+      <p>TuRenta también está en <b>Google Play</b> como app (busca «TuRenta»). Entras con el mismo correo y la misma contraseña y ves lo mismo que en la página, a pantalla completa. En la app no se ven precios ni pagos del plan de TuRenta: tu plan y tus módulos los ves con Tukán Software. Lo que cobras a tus clientes (cuotas, recibos, portal del cliente) funciona igual.</p>
+</section>
+
+<section class="cap" id="c4">
+  <h1><span class="num">4</span> Configuración del negocio y reglas</h1>
+  <span class="plan">Base · dueño y administradores</span>
+  <p>En <b>Más → Configuración</b> hay varias pestañas. Lo que pongas aquí sale en tus cotizaciones, contratos, recibos y en tu página pública.</p>
+  <figure class="pc m70"><img src="capturas/29_configuracion.png" alt=""><figcaption>Configuración → Negocio: datos del negocio y logo.</figcaption></figure>
+  <table class="t">
+    <tr><th style="width:22%">Pestaña</th><th>Qué se configura</th></tr>
+    <tr><td><b>Negocio</b></td><td>Nombre comercial, razón social, RUC, teléfono, <b>WhatsApp del negocio</b>, correo, ciudad, dirección, enlace de Google Maps, Instagram, Facebook, el <b>enlace para dejar reseña en Google</b>, la descripción para tu página pública y el <b>color de tu marca</b>. Toca <b>Guardar datos del negocio</b>. Al lado, <b>Subir tu logo</b> y <b>Guardar logo</b>.</td></tr>
+    <tr><td><b>Reglas</b></td><td>IVA (%), días que vale una cotización, días que se retiene una fecha cotizada, <b>reserva para separar la fecha (%)</b>, número de pagos, hasta cuántos días antes se paga el saldo, garantía por daños ($), hora máxima de fin, horas de montaje y de desmontaje, invitados por mesero, aviso para revisar el precio, comisión del vendedor (%) y las condiciones que salen en la cotización.</td></tr>
+    <tr><td><b>Cobros en línea</b></td><td>Cómo te pagan tus clientes: <b>datos para transferencia</b> y <b>celular de DeUna</b> (los ve el cliente en su portal). Si tienes el módulo Cobros en línea, aquí pegas el <b>Token</b> y el <b>Store ID</b> de Payphone; la pantalla explica dónde sacarlos.</td></tr>
+    <tr><td><b>Página pública</b></td><td>El enlace de tu página, los botones <b>Copiar</b>, <b>Ver mi página</b> y <b>Compartir por WhatsApp</b>, y el <b>código QR</b> para imprimir.</td></tr>
+    <tr><td><b>Tareas</b></td><td>La lista de tareas que se copia sola a cada evento nuevo (ej. «Degustación del menú con los novios», 60 días antes), por tipo de evento.</td></tr>
+    <tr><td><b>Google Calendar</b></td><td>Módulo Exportar: tu enlace secreto para ver tus eventos en Google Calendar, con el paso a paso, y <b>Cambiar el enlace</b> si alguien más lo vio.</td></tr>
+    <tr><td><b>Más</b></td><td>Acceso a las plantillas de contrato, el <b>WhatsApp para transmisiones</b> (boda en vivo), catálogo, paquetes, espacios, usuarios y Mi plan.</td></tr>
+  </table>
+  <div class="ojo"><b>Ojo</b>Cambiar las reglas no cambia las cotizaciones ni los planes de pago que ya existen: vale para los nuevos.</div>
+</section>
+
+<section class="cap" id="c5">
+  <h1><span class="num">5</span> Espacios, fechas cerradas y planos</h1>
+  <span class="plan">Base · planos con el módulo «Plano del salón»</span>
+  <p>Un <b>espacio</b> es lo que alquilas: salón, jardín, terraza, capilla… <b>Cada uno se reserva por separado</b>: nunca se vende dos veces el mismo a la misma hora. Tu demo trae dos de ejemplo (Salón principal y Jardín) para que los cambies por los tuyos.</p>
+  <h2>Crear o cambiar un espacio</h2>
+  <ol class="pasos">
+    <li>Ve a <b>Más → Espacios</b> y toca <b>Nuevo espacio</b> (o <b>Editar</b> en uno que ya existe).</li>
+    <li>Escribe el <b>Nombre</b>, el <b>Alquiler del espacio</b> (precio base, opcional), la <b>Capacidad sentados</b> (banquete) y <b>de pie</b> (cóctel), la <b>Descripción</b> para tu página pública, el <b>color en el calendario</b> y sube una <b>foto</b>.</li>
+    <li>Guarda. Si un espacio ya no se usa, toca <b>Desactivar</b>: sus eventos no se borran.</li>
+  </ol>
+  <figure class="pc m80"><img src="capturas/30_espacios.png" alt=""><figcaption>Espacios con su capacidad y alquiler, y las fechas cerradas.</figcaption></figure>
+  <h2>Fechas cerradas</h2>
+  <p>Los días que no alquilas (mantenimiento, feriado propio, uso familiar). Elige la <b>Fecha</b>, <b>¿Qué se cierra?</b> (todo el local o un solo espacio), el motivo y toca <b>Cerrar fecha</b>. Esos días no se pueden separar y en tu página pública salen como ocupados. Para volver a abrirla, toca <b>Abrir</b>.</p>
+  <h2>Planos del salón</h2>
+  <p>Con el módulo <b>Plano del salón</b>, en <b>Más → Planos del salón</b> (o en cada espacio, <b>Plano y distribuciones</b>) armas una vez cómo se acomoda cada espacio: toca <b>Nueva distribución</b>, ponle nombre y medidas en metros y elige cómo empezar: vacía, el ejemplo de boda o quince (mesas redondas, pista y tarima) o el ejemplo corporativo (mesas en filas mirando a la tarima). Después la usas en cada evento (capítulo 15).</p>
+</section>
+
+<section class="cap" id="c6">
+  <h1><span class="num">6</span> Catálogo, paquetes y extras</h1>
+  <span class="plan">Base · paquetes y extras son módulos</span>
+  <p>El <b>catálogo</b> es todo lo que vendes: menús, bebidas, decoración, música, foto y video, mobiliario, personal, transmisión… Con él armas paquetes y cotizaciones en segundos. Tu demo trae un catálogo de ejemplo.</p>
+  <h2>Agregar o cambiar un producto</h2>
+  <ol class="pasos">
+    <li>Ve a <b>Más → Catálogo y precios</b> y toca <b>+ Agregar producto</b> (o <b>Editar</b>).</li>
+    <li>Escribe el nombre, la categoría, cómo <b>Se cobra</b> (por persona, por evento, por hora o por unidad), el <b>Precio al cliente</b> y <b>Lo que te cuesta</b> (así TuRenta calcula tu margen).</li>
+    <li>Toca <b>Agregar al catálogo</b>. Lo que ya no vendes, <b>Desactivar</b> (no se borra).</li>
+  </ol>
+  <figure class="pc m80"><img src="capturas/31_catalogo.png" alt=""><figcaption>Catálogo y precios: cada producto con su costo y su margen.</figcaption></figure>
+  <div class="consejo"><b>Subir precios en bloque</b>Abajo del catálogo puedes subir los precios de una vez (por ejemplo +5 % a todo el menú a inicio de año).</div>
+  <h2>Paquetes</h2>
+  <p>Módulo <b>Paquetes y simulador</b>. En <b>Más → Paquetes</b> juntas productos del catálogo en paquetes listos (Boda Oro, Quince años…) con su precio dentro del paquete y el mínimo de invitados. Toca <b>+ Crear paquete</b>; en cada uno tienes <b>Editar</b>, <b>Duplicar</b>, <b>Desactivar</b> y <b>¿Cuánto sale?</b>, que calcula el precio para un número de invitados y te deja copiar la respuesta para el cliente.</p>
+  <h2>Extras del portal</h2>
+  <p>Módulo <b>Formulario, extras y encuesta</b>. En <b>Más → Extras del portal</b> marcas qué productos puede pedir el cliente solo desde su portal (hora adicional, hora loca, mesero adicional…), con un texto corto y una foto. Los pedidos te llegan para aprobarlos (capítulo 13).</p>
+</section>
+
+<section class="cap" id="c7">
+  <h1><span class="num">7</span> El calendario y un evento nuevo</h1>
+  <span class="plan">Base</span>
+  <p>En el <b>Calendario</b> ves cada mes con sus eventos en el color de su estado. Puedes ver <b>Todos los espacios</b> o uno solo. <b>Toca un día</b> para ver qué espacios están libres. La vista <b>Próximos sábados</b> te dice al instante qué sábados te quedan libres.</p>
+  <figure class="pc m100"><img src="capturas/04_calendario.png" alt=""><figcaption>El mes con la boda separada, un cumpleaños en consulta, una fecha cerrada y unos quince años cotizados.</figcaption></figure>
+  <h2>Los estados de un evento</h2>
+  <table class="t">
+    <tr><th style="width:18%">Estado</th><th>Qué significa</th></tr>
+    <tr><td>Consulta</td><td>El cliente preguntó. La fecha no está guardada.</td></tr>
+    <tr><td>Cotizado</td><td>Ya tiene cotización. La fecha queda <b>retenida</b> unos días, sin bloquearla.</td></tr>
+    <tr><td>Separado</td><td>Pagó la reserva: la fecha y el espacio quedan <b>bloqueados</b>.</td></tr>
+    <tr><td>Confirmado</td><td>Contrato firmado. El evento va.</td></tr>
+    <tr><td>Realizado</td><td>El evento ya pasó.</td></tr>
+    <tr><td>Perdido / Cancelado</td><td>El cliente no contrató / se canceló después de separar (con el motivo).</td></tr>
+  </table>
+  <div class="tarea">
+    <div>
+      <h2>Anotar un evento nuevo</h2>
+      <ol class="pasos">
+        <li>Toca <b>Nuevo evento</b> (en el Inicio, el Calendario o Eventos).</li>
+        <li><b>Cliente:</b> elige <b>Cliente nuevo</b> (nombre y celular) o <b>Ya está registrado</b>, y <b>¿Cómo nos conoció?</b></li>
+        <li><b>Evento:</b> <b>¿Qué celebran?</b>, la fecha, a qué hora empieza y termina, los invitados, el montaje y los espacios.</li>
+        <li><b>Venta:</b> el presupuesto del cliente, el vendedor y notas. Toca <b>Crear evento</b>.</li>
+      </ol>
+      <p>Con nombre, celular y fecha basta para empezar: el evento nace como <b>Consulta</b> y lo demás se completa después.</p>
+    </div>
+    <div class="nota" style="margin-top:2mm"><b>Sin doble reserva</b>Un espacio no puede quedar separado dos veces a la misma hora: lo impide la base de datos. Cada evento ocupa el espacio desde las <b>horas de montaje</b> antes hasta las <b>horas de desmontaje</b> después. Si un evento termina después de medianoche (ej. 02:00), se entiende que es al día siguiente.</div>
+  </div>
+  <figure class="pc m100"><img src="capturas/05_evento_nuevo.png" alt=""><figcaption>Nuevo evento: cliente, evento y venta.</figcaption></figure>
+  <div class="consejo"><b>Lista de espera</b>Si la fecha ya está separada por otro evento, TuRenta te avisa. Puedes tocar <b>Guardarlo igual como consulta</b>: queda en lista de espera y no se podrá separar mientras el otro evento tenga la fecha.</div>
+  <h2>La lista de eventos y el tablero de ventas</h2>
+  <p>En <b>Eventos</b> buscas y filtras por tipo, vendedor, fechas y estado, con lo vendido, lo cobrado y lo que falta cobrar. La vista <b>Tablero de ventas</b> muestra tus ventas en camino, de la consulta a la confirmación, con el valor de cada columna.</p>
+</section>
+
+<section class="cap" id="c8">
+  <h1><span class="num">8</span> Un evento por dentro</h1>
+  <span class="plan">Base · algunas pestañas son de módulos</span>
+  <p>Al abrir un evento ves arriba su código (EV-año-número), la fecha, el horario, el espacio, los invitados y el estado. Debajo, las pestañas: <b>Resumen</b>, <b>Cotización</b>, <b>Contrato</b>, <b>Pagos</b>, <b>Día del evento</b>, <b>Invitados</b>, <b>Formulario y extras</b> y <b>Plano</b>. Las de un módulo que no tienes no salen.</p>
+  <figure class="pc"><img src="capturas/06_evento_resumen.png" alt=""><figcaption>Resumen de la boda: estado, datos del evento, cliente, tareas, dinero, cotización y contrato.</figcaption></figure>
+  <h2>Lo que hay en el Resumen</h2>
+  <ul class="lista">
+    <li><b>Estado:</b> los botones para pasar al siguiente (por ejemplo «Volver a separado» o «Cancelar evento», que pide el motivo). Al pagar la reserva el evento se separa solo y al firmar el contrato se confirma solo.</li>
+    <li><b>Datos del evento</b> con <b>Editar</b> · el <b>Cliente</b> con <b>Ver ficha</b> y <b>Escribir por WhatsApp</b>.</li>
+    <li><b>Menú y detalles del cliente</b> (menú elegido y lo que pidió) con <b>Guardar detalles</b>.</li>
+    <li><b>Tareas</b> con su fecha límite: márcalas como <b>Hecha</b> o agrega una con <b>Nueva tarea</b>.</li>
+    <li><b>Dinero:</b> total, pagado, saldo, lo vencido y la próxima cuota, con <b>Ver pagos</b>.</li>
+    <li><b>Cotización y contrato</b> con <b>Abrir</b> · <b>Portal del cliente</b> con <b>Copiar enlace</b> y <b>Enviar por WhatsApp</b> (módulo).</li>
+    <li><b>Coordinador del día:</b> elige a alguien y toca <b>Asignar</b>; le llega un aviso.</li>
+    <li><b>Seguimiento:</b> anota una llamada, WhatsApp, visita, degustación… ahora o agendada.</li>
+    <li><b>Copiar a otra fecha</b> (para el mismo cliente, por ejemplo la fiesta de la empresa cada año) e <b>Historial de cambios</b>.</li>
+  </ul>
+</section>
+
+<section class="cap" id="c9">
+  <h1><span class="num">9</span> Seguimiento, clientes y mensajes por WhatsApp</h1>
+  <span class="plan">Base</span>
+  <h2>Seguimiento</h2>
+  <p>En <b>Más → Seguimiento</b> ves a quién llamar, escribir o recibir: <b>Atrasadas</b>, <b>Para hoy</b> y <b>Próximos 7 días</b>, cada una con <b>Hecho</b>, <b>WhatsApp</b>, <b>Llamar</b> y <b>Reagendar</b>. Puedes ver <b>Todo el equipo</b> o <b>Solo lo mío</b>. A la derecha: <b>Consultas sin atender</b> (nadie les escribió en 3 días), <b>Cotizaciones sin respuesta</b> (con <b>Preguntar</b>) y <b>Fechas retenidas que vencen</b>.</p>
+  <figure class="pc"><img src="capturas/07_seguimiento.png" alt=""><figcaption>Seguimiento: nada se queda sin respuesta.</figcaption></figure>
+  <h2>Mensajes por WhatsApp</h2>
+  <p>En <b>Más → Mensajes por WhatsApp</b> TuRenta te deja listos los mensajes del día: cuotas que vencen o ya vencieron, pedir la lista de invitados, formularios del evento sin llenar, contratos por firmar y la encuesta después del evento, entre otros. Toca <b>Enviar por WhatsApp</b>, revisa el texto y mándalo; después toca <b>✓ Marcar como enviado</b>.</p>
+  <figure class="pc"><img src="capturas/08_mensajes.png" alt=""><figcaption>Mensajes de hoy listos para enviar.</figcaption></figure>
+  <h2>Clientes</h2>
+  <p>Los clientes se agregan solos al crear eventos o al llegar consultas de tu página. En <b>Más → Clientes</b> buscas a cualquiera; en su ficha ves sus eventos, cuánto contrató, pagó y debe, editas sus datos (con <b>Guardar ficha</b>) y anotas su seguimiento.</p>
+  <div class="tarea">
+    <div>
+      <h2>Tu página pública</h2>
+      <p>Tu local tiene su propia página para Instagram, Facebook y WhatsApp (el enlace está en Configuración → Página pública). Ahí el cliente ve tus espacios, consulta <b>¿Está libre tu fecha?</b> y llena <b>Pide información</b>.</p>
+      <ol class="pasos">
+        <li>La consulta entra sola a TuRenta como un evento en estado <b>Consulta</b>.</li>
+        <li>Te llega un aviso y sale en el Inicio en <b>Para atender</b>, con un seguimiento para responderle por WhatsApp.</li>
+      </ol>
+    </div>
+    <figure class="cel"><img src="capturas/34_pagina_publica_celular.png" alt=""><figcaption>La página pública del local.</figcaption></figure>
+  </div>
+</section>
+
+<section class="cap" id="c10">
+  <h1><span class="num">10</span> La cotización</h1>
+  <span class="plan">Base · «Desde un paquete» con el módulo Paquetes</span>
+  <p>Arriba de la pestaña <b>Cotización</b> ves los 4 pasos: <b>Armar → Enviar al cliente → El cliente acepta → Contrato</b>.</p>
+  <h2>Armarla</h2>
+  <ol class="pasos">
+    <li>En el evento, abre la pestaña <b>Cotización</b> y elige <b>Desde un paquete</b> (carga todo el paquete con los invitados del evento) o <b>En blanco</b> (solo con el alquiler del espacio). Toca <b>Crear cotización</b>.</li>
+    <li>Ajusta cada línea: categoría, descripción, cantidad, cómo se cobra, precio, costo y si lleva IVA. Las líneas «por persona» se recalculan solas al cambiar los invitados.</li>
+    <li>Agrega más con <b>Agregar del catálogo</b> o <b>Agregar un paquete completo</b>, pon el <b>Descuento</b> y las notas para el cliente, y toca <b>Guardar</b>.</li>
+  </ol>
+  <figure class="pc"><img src="capturas/09_cotizacion_armar.png" alt=""><figcaption>La cotización de los quince años, armada desde el Paquete Quince Años.</figcaption></figure>
+  <p>A la derecha ves los totales: subtotal, descuento, IVA, total, <b>por persona</b> y, solo para el dueño y los administradores, la <b>ganancia</b> y el margen.</p>
+  <div class="tarea">
+    <div>
+      <h2>Enviarla y que la acepte</h2>
+      <ol class="pasos">
+        <li>En <b>Enlace para el cliente</b> toca <b>Enviar por WhatsApp</b> (o <b>Copiar enlace</b>). El evento pasa a <b>Cotizado</b> y la fecha queda retenida unos días.</li>
+        <li>El cliente abre el enlace en su celular, ve la cotización con tu logo, la descarga en PDF y la acepta escribiendo su nombre y tocando <b>Aceptar cotización</b>.</li>
+        <li>Si te dice que sí por teléfono o en persona, toca <b>El cliente aceptó</b>.</li>
+      </ol>
+      <p>Al aceptarla, el evento toma ese valor y se arma solo su <b>plan de pagos</b> (capítulo 12).</p>
+      <ul class="lista">
+        <li><b>Nueva versión:</b> si el cliente pide cambios; la anterior queda reemplazada.</li>
+        <li><b>El cliente no la aceptó:</b> para registrar que dijo que no.</li>
+        <li><b>Ver PDF</b> y el historial de <b>Versiones</b>.</li>
+      </ul>
+    </div>
+    <figure class="cel"><img src="capturas/10_cotizacion_cliente_celular.png" alt=""><figcaption>Lo que ve el cliente en su celular.</figcaption></figure>
+  </div>
+  <div class="ojo"><b>Ojo</b>Una cotización aceptada ya no se edita. Si el cliente pide cambios después de aceptar, crea una nueva versión.</div>
+</section>
+
+<section class="cap" id="c11">
+  <h1><span class="num">11</span> El contrato con firma en el celular</h1>
+  <span class="plan">Módulo «Contratos con firma»</span>
+  <p>El contrato se llena solo con los datos del cliente, del evento, lo contratado y el plan de pagos. Sale de tu <b>plantilla</b>.</p>
+  <h2>Paso a paso</h2>
+  <ol class="pasos">
+    <li><b>El cliente acepta la cotización</b>: así el contrato sale con el valor y el plan de pagos.</li>
+    <li>En la pestaña <b>Contrato</b> toca <b>Generar contrato</b>.</li>
+    <li>Revisa el texto (puedes cambiarlo y tocar <b>Guardar cambios</b>) y toca <b>Enviar para firmar por WhatsApp</b> o <b>Dejar listo para firmar</b>. Desde ese momento el texto queda fijo.</li>
+    <li>El cliente lo abre en su celular, lo lee, escribe su nombre y su cédula o RUC, <b>firma con el dedo</b>, marca <b>Leí y acepto el contrato</b> y toca <b>Firmar contrato</b>. Te llega un aviso.</li>
+  </ol>
+  <figure class="pc"><img src="capturas/11_contrato.png" alt=""><figcaption>Contrato firmado: quién firmó, la cédula, la fecha, el código y la huella.</figcaption></figure>
+  <div class="tarea">
+    <div>
+      <h2>Después de la firma</h2>
+      <ul class="lista">
+        <li>Si la reserva ya está pagada, el evento pasa solo a <b>Confirmado</b>.</li>
+        <li>El PDF firmado lleva un <b>QR de verificación</b>: con <b>Ver la página de verificación</b> cualquiera comprueba que el texto no se cambió después de firmar.</li>
+        <li>Si cambió algo importante (fecha, valor) o hubo un error, usa <b>Anular este contrato</b> y prepara uno nuevo.</li>
+      </ul>
+      <h2>Plantillas de contrato</h2>
+      <p>En <b>Más → Plantillas de contrato</b> (solo el dueño o un administrador) editas el texto base. Las variables como <b>{{cliente}}</b> se llenan solas. Tienes <b>Vista previa</b> (con datos de ejemplo), <b>Editar</b> y <b>Restaurar la de fábrica</b>. Los contratos ya generados no cambian al editar una plantilla.</p>
+      <h2>Anexos por extras</h2>
+      <p>Si apruebas extras que el cliente pidió desde su portal y el contrato ya estaba firmado, se prepara solo un <b>anexo</b> con los extras, su valor, el nuevo total y la cuota nueva, para que el cliente lo firme también con el dedo.</p>
+    </div>
+    <figure class="cel"><img src="capturas/12_firmar_celular.png" alt=""><figcaption>El cliente firma con el dedo.</figcaption></figure>
+  </div>
+</section>
+
+<section class="cap" id="c12">
+  <h1><span class="num">12</span> Pagos y cobros</h1>
+  <span class="plan">Base · tarjeta con el módulo «Cobros en línea»</span>
+  <p>Cuando el cliente acepta la cotización se arma el <b>plan de pagos</b> con tus reglas: la <b>reserva</b> (el % que pusiste), las cuotas y el <b>saldo</b>, que vence los días antes del evento que elegiste. Lo ves en la pestaña <b>Pagos</b> del evento: cada pago con su fecha, lo pagado, lo que falta y si está pagada, pendiente o vencida.</p>
+  <figure class="pc"><img src="capturas/13_pagos_evento.png" alt=""><figcaption>Plan de pagos de la boda y el formulario «Registrar un pago recibido».</figcaption></figure>
+  <h2>Registrar un pago</h2>
+  <ol class="pasos">
+    <li>En <b>Registrar un pago recibido</b> escribe el <b>Valor recibido</b> (TuRenta te sugiere lo que falta de la cuota).</li>
+    <li>Elige la <b>Forma de pago</b>: efectivo, transferencia, DeUna, tarjeta, cheque u otro; la fecha, el número de comprobante y, si quieres, la foto.</li>
+    <li>Toca <b>Guardar pago y generar recibo</b>. Cada pago tiene su <b>Recibo PDF</b>; un pago equivocado se <b>Anula</b> (no se borra).</li>
+  </ol>
+  <div class="nota"><b>La fecha se separa sola</b>Cuando lo pagado completa la reserva, el evento pasa a <b>Separado</b> y el espacio queda bloqueado para ese día y hora.</div>
+  <ul class="lista">
+    <li><b>Armar el plan automático</b> o <b>Cambiar el plan a mano</b> (las cuotas deben sumar el total).</li>
+    <li><b>Recordar el pago por WhatsApp</b>, <b>Estado de cuenta (PDF)</b> y los enlaces al portal del cliente.</li>
+    <li><b>Comprobantes por revisar:</b> los que el cliente sube desde su portal. Revisa en tu banco que el dinero llegó y toca <b>Confirmar: el dinero llegó</b> (recién ahí suma) o <b>Rechazar</b>.</li>
+    <li><b>Garantía por daños:</b> es aparte del valor del evento. Usa <b>Registrar garantía recibida</b>, <b>Devolver la garantía</b> o <b>Retener por daños</b>.</li>
+    <li><b>Gastos del evento</b> (<b>+ Registrar un gasto</b>) y la <b>Ganancia del evento</b>: lo que calculaste con los costos del catálogo y lo que ganaste de verdad (gastos, compras a proveedores y pagos al personal).</li>
+  </ul>
+  <h2>Cobros (todo el local)</h2>
+  <p>En <b>Cobros</b> ves lo cobrado este mes y el anterior, el <b>total por cobrar</b>, lo <b>vencido</b>, los comprobantes por revisar, las cuotas vencidas y las que vencen en 7, 15 o 30 días (cada una con <b>WhatsApp</b>, <b>Ver evento</b> y <b>Registrar pago</b>) y las <b>garantías por devolver</b>.</p>
+  <figure class="pc"><img src="capturas/14_cobros.png" alt=""><figcaption>Cobros: lo que te deben, lo cobrado y a quién recordarle hoy.</figcaption></figure>
+  <div class="consejo"><b>Pago con tarjeta</b>Con el módulo <b>Cobros en línea (Payphone)</b> y tus claves en Configuración → Cobros en línea, el cliente paga sus cuotas con tarjeta desde su portal y el pago se registra solo.</div>
+</section>
+
+<section class="cap" id="c13">
+  <h1><span class="num">13</span> El portal del cliente</h1>
+  <span class="plan">Módulos «Portal del cliente» y «Formulario, extras y encuesta»</span>
+  <div class="tarea">
+    <div>
+      <p>Cada evento tiene un <b>enlace secreto para el cliente</b>, sin usuario ni contraseña. Lo mandas desde el Resumen o la pestaña Pagos con <b>Enviar por WhatsApp</b>. Ahí el cliente ve:</p>
+      <ul class="lista">
+        <li>La cuenta regresiva y los datos de su evento.</li>
+        <li><b>Tus documentos:</b> la cotización y el contrato (PDF y verificación).</li>
+        <li><b>Tus pagos:</b> el valor, lo pagado, lo que falta, el plan de pagos, el historial con sus recibos y la garantía. Puede subir la foto de su transferencia y, si tienes Cobros en línea, pagar con tarjeta.</li>
+        <li><b>Tus invitados</b> (módulo Invitados), el <b>cronograma</b> (módulo Día del evento) y el botón <b>Ver en vivo</b> (módulo Boda en vivo).</li>
+        <li>Botones para escribirte por WhatsApp o llamarte.</li>
+      </ul>
+    </div>
+    <figure class="cel"><img src="capturas/15_portal_celular.png" alt=""><figcaption>El portal de Ana y Diego.</figcaption></figure>
+  </div>
+  <div class="tarea">
+    <div>
+      <h2>Formulario del evento</h2>
+      <p>Las preguntas que el cliente responde desde su portal: ceremonia, música, momentos especiales, decoración, comida, invitados, proveedores y el día del evento. Hay un formulario por tipo de evento que editas en <b>Más → Formularios del evento</b> (solo el dueño o un administrador): preguntas de texto, una opción, varias opciones, sí o no, número, fecha u hora, y si son obligatorias.</p>
+      <ul class="lista">
+        <li>El cliente lo llena <b>hasta X días antes</b> (lo eliges tú) y <b>se guarda solo</b> mientras escribe. Al final toca <b>Listo, enviar al local</b>.</li>
+        <li>Tú ves y corriges las respuestas en la pestaña <b>Formulario y extras</b> del evento, con su PDF. Salen también en la hoja del evento.</li>
+        <li>Si no lo llena, sale el recordatorio en Mensajes por WhatsApp.</li>
+      </ul>
+    </div>
+    <figure class="cel"><img src="capturas/16_formulario_celular.png" alt=""><figcaption>El formulario de boda en el celular.</figcaption></figure>
+  </div>
+  <h2>Extras pedidos en línea</h2>
+  <p>El cliente elige en su portal los extras que ofreces (cantidad y nota) y toca <b>Enviar pedido al local</b>. No paga nada todavía. Tú lo ves en la pestaña <b>Formulario y extras</b> y en <b>Más → Extras del portal</b>:</p>
+  <ul class="lista">
+    <li><b>Aprobar y sumar al evento:</b> se crea una versión nueva de la cotización y una cuota «Extras» en el plan de pagos. Si el contrato ya estaba firmado, se prepara un anexo para firmar.</li>
+    <li><b>No aprobar</b>, con una nota para el cliente.</li>
+  </ul>
+  <figure class="pc"><img src="capturas/17_extras_local.png" alt=""><figcaption>Extras que pidió el cliente, esperando tu respuesta.</figcaption></figure>
+  <h2>Encuesta de satisfacción</h2>
+  <p>Después del evento, el cliente recibe una encuesta corta: ¿nos recomendarías? (de 0 a 10), la comida, la atención, las instalaciones y la organización. A quien le encantó se le pide la <b>reseña en Google</b> (con el enlace de Configuración → Negocio); si la nota es baja, al dueño le llega un aviso para llamarle. Los resultados están en Reportes → Satisfacción.</p>
+</section>
+
+<section class="cap" id="c14">
+  <h1><span class="num">14</span> El día del evento</h1>
+  <span class="plan">Módulo «Día del evento» · mobiliario, proveedores, incidencias y boda en vivo son módulos aparte</span>
+  <p>La pestaña <b>Día del evento</b> tiene secciones: <b>Cronograma</b>, <b>Personal</b>, <b>Proveedores</b>, <b>Incidencias</b>, <b>Mobiliario</b>, <b>Montaje y menú</b> y <b>Boda en vivo</b>, más el botón <b>Hoja del evento (PDF)</b> para imprimir y repartir al equipo.</p>
+  <figure class="pc"><img src="capturas/18_dia_evento.png" alt=""><figcaption>El cronograma de la boda y el modo en vivo.</figcaption></figure>
+  <h2>Cronograma</h2>
+  <ul class="lista">
+    <li>Al entrar puedes cargar un <b>cronograma de ejemplo</b> (boda, quince años, corporativo u otro) desde la hora de inicio, y ajustarlo.</li>
+    <li><b>Agregar un momento:</b> hora, minutos, qué pasa, responsable, notas y el proveedor a cargo. Se ubica solo según la hora.</li>
+    <li>Cada momento tiene <b>Editar</b> y las flechas para moverlo. <b>Ordenar por hora</b> y <b>PDF</b>.</li>
+  </ul>
+  <div class="tarea">
+    <div>
+      <h2>Modo en vivo</h2>
+      <p>Para el coordinador, el DJ y el fotógrafo: toca <b>Abrir modo en vivo</b> o mándales el enlace (<b>WhatsApp al DJ</b>, <b>Al fotógrafo</b>, <b>Al coordinador</b>). En el celular ven <b>qué va ahora</b>, <b>qué sigue</b> y el <b>atraso</b>, con un botón grande para empezar el siguiente momento. Se actualiza solo.</p>
+      <h2>Personal</h2>
+      <p>En <b>Más → Personal</b> registras a tus meseros, capitanes, cocina, bartenders, seguridad y más, con lo que les pagas por evento. En el evento los asignas con su horario; TuRenta te avisa si faltan meseros según los invitados. Marcas quién <b>Confirmó</b>, <b>Asistió</b> y si ya está <b>Pagado</b>.</p>
+      <p>Cada persona tiene su <b>enlace</b>: ve sus eventos, a qué hora llega y sale, qué hace, cuánto gana, confirma que va y ve sus pagos.</p>
+    </div>
+    <div>
+      <figure class="cel"><img src="capturas/19_vivo_celular.png" alt=""><figcaption>Modo en vivo del bautizo.</figcaption></figure>
+    </div>
+  </div>
+  <div class="tarea">
+    <div>
+      <h2>Proveedores del evento</h2>
+      <p>Módulo Proveedores y compras. Los proveedores del evento con su hora de llegada, la orden de compra y su saldo, y los que trae el cliente. Marcas si <b>Confirmó</b>, la hora en que llegó (para la puntualidad) y, con <b>Evaluar</b>, si cumplió y sus estrellas. También puedes <b>Reportar un problema</b>.</p>
+      <h2>Mobiliario</h2>
+      <p>Módulo Mobiliario y menaje. Para cada evento escribes cuántas sillas, mesas, manteles, platos y copas usas. «Libres ese día» ya descuenta lo que reservaron otros eventos de la misma fecha, así sabes si alcanza. Después del evento anotas los <b>dañados o perdidos</b> y TuRenta calcula cuánto cobrar con el costo de reposición. Tu inventario está en <b>Más → Mobiliario</b>.</p>
+      <h2>Montaje y menú · Boda en vivo</h2>
+      <p><b>Montaje y menú</b> junta el montaje, el menú elegido, lo que pidió el cliente y la comida especial de los invitados. <b>Boda en vivo</b> (módulo) guarda el estado de la transmisión (pedida a QF Producciones o confirmada) y su enlace, que aparece en el portal y en las invitaciones con el botón «Ver en vivo».</p>
+    </div>
+    <figure class="cel"><img src="capturas/20_personal_celular.png" alt=""><figcaption>El enlace del capitán de meseros.</figcaption></figure>
+  </div>
+</section>
+
+<section class="cap" id="c15">
+  <h1><span class="num">15</span> Invitados con QR y plano del salón</h1>
+  <span class="plan">Módulos «Invitados con QR» y «Plano del salón»</span>
+  <p>En la pestaña <b>Invitados</b> armas la lista, las mesas y mandas las invitaciones. Arriba ves cuántos invitados, pases, confirmados, no asisten y pendientes.</p>
+  <figure class="pc"><img src="capturas/21_invitados.png" alt=""><figcaption>Invitados de la boda: modo puerta, enlace para los novios, PDF y la lista.</figcaption></figure>
+  <h2>La lista</h2>
+  <ul class="lista">
+    <li><b>Agregar invitado</b> uno por uno, o <b>Pegar lista</b> completa desde WhatsApp, Excel o el bloc de notas: <i>Nombre; celular; pases; grupo</i>. Solo el nombre es obligatorio y no se repiten los que ya están.</li>
+    <li>Filtra por respuesta, grupo o mesa, y elige la mesa de cada invitado.</li>
+    <li><b>Mesas:</b> toca <b>Crear mesas</b> con los puestos por mesa; se numeran solas y puedes renombrar una como «Mesa de honor».</li>
+    <li><b>Invitaciones:</b> toca <b>Invitar</b> en cada uno: se abre WhatsApp con el mensaje listo y queda marcado como enviado.</li>
+    <li><b>Lista (PDF)</b>, <b>Plano de mesas (PDF)</b> y <b>Descargar para Excel</b>.</li>
+  </ul>
+  <div class="tarea">
+    <div>
+      <h2>La invitación digital</h2>
+      <p>Cada invitado recibe su enlace con la fecha, la hora, el lugar, el mapa y su mesa. Confirma cuántas personas van (hasta sus pases) y su comida especial. Al confirmar recibe su <b>código QR</b>, que es su entrada.</p>
+      <h2>Para los novios</h2>
+      <p>Con <b>Mandar a</b> (el nombre del cliente) le envías un enlace para que arme su lista, sus mesas y mande las invitaciones desde su celular, sin usuario ni contraseña.</p>
+      <h2>Modo puerta</h2>
+      <p>Para quien recibe en la entrada: <b>Abrir modo puerta</b> (o mándale el enlace). Tiene un buscador grande, marca el ingreso y <b>lee los QR con la cámara del celular</b>. Arriba cuenta cuántos ingresaron.</p>
+    </div>
+    <figure class="cel"><img src="capturas/22_invitacion_celular.png" alt=""><figcaption>La invitación de Rosa.</figcaption></figure>
+  </div>
+  <h2>El plano del evento</h2>
+  <p>En la pestaña <b>Plano</b> eliges una distribución del espacio (capítulo 5) o empiezas desde cero con las medidas. Toca <b>Agregar</b> para poner mesas redondas, rectangulares o imperiales, pista, tarima, barra, buffet, dulces, DJ, entrada, baños, columnas o texto. Arrastra cada cosa con el dedo o el mouse; tócala para cambiarle el nombre, los puestos o girarla. <b>Se guarda solo</b>.</p>
+  <figure class="pc"><img src="capturas/23_plano_evento.png" alt=""><figcaption>El plano de la boda: cada mesa muestra ocupados / puestos y su color (vacía, con lugar, llena o se pasa).</figcaption></figure>
+  <div class="consejo"><b>Unido a las mesas</b>Las mesas del plano son las mismas de la lista de invitados: con <b>Sentar invitados</b> eliges quién va en cada una. El plano sale en PDF a escala (<b>PDF para imprimir</b>) y los novios lo ven en su portal.</div>
+</section>
+
+<section class="cap" id="c16">
+  <h1><span class="num">16</span> Proveedores y compras</h1>
+  <span class="plan">Módulos «Proveedores y compras», «Portal del proveedor» e «Incidencias y puntaje»</span>
+  <p>En <b>Más → Proveedores</b> están tus DJ, fotógrafos, florerías, catering y más: lo que les compras, lo que les debes, sus documentos y cómo cumplen. Para agregar uno, llena <b>Agregar proveedor</b> (nombre, servicio, contacto, celular, correo y, si quieres, <b>RUC, cuenta del banco y crédito</b>).</p>
+  <figure class="pc"><img src="capturas/24_proveedores.png" alt=""><figcaption>Proveedores con sus documentos por vencer, lo que les debes y su puntaje.</figcaption></figure>
+  <h2>La ficha del proveedor</h2>
+  <p>Pestañas: Resumen, Cuenta, Eventos, Documentos, Precios, Incidencias y Bitácora (todo lo que pasó con él). Tienes <b>WhatsApp</b>, <b>Nueva compra</b>, <b>Estado de cuenta (PDF)</b>, <b>Editar datos</b>, <b>Reportar problema</b> y, para transferirle, <b>Copiar datos</b> de su banco. En <b>Documentos</b> subes su RUC, permisos, ARCSA o póliza con la fecha en que vencen: TuRenta te avisa antes.</p>
+  <figure class="pc"><img src="capturas/25_proveedor_ficha.png" alt=""><figcaption>Ficha del DJ: lo que le debes, cómo cumple, sus datos para transferir y su portal.</figcaption></figure>
+  <h2>Compras y facturas</h2>
+  <ul class="lista">
+    <li>En <b>Compras</b> toca <b>Nueva compra o pedido de precio</b>: proveedor, evento (o compra general) y las líneas. Cada orden tiene su número (OC-0001), su PDF con QR y se manda por WhatsApp.</li>
+    <li>La compra pasa de <b>pedido de precio</b> a <b>pedida</b>, <b>confirmada</b> y <b>entregada</b> (o cancelada con su motivo). Con varios pedidos de precio puedes <b>comparar precios</b> y elegir.</li>
+    <li><b>Factura del proveedor:</b> a mano o con <b>Subir factura electrónica</b> (el XML del SRI): se llenan solos el número, la fecha, los valores y el RUC.</li>
+    <li><b>Pagos al proveedor:</b> también con cheque posfechado. No se paga más que el saldo; un pago se anula, no se borra.</li>
+  </ul>
+  <div class="tarea">
+    <div>
+      <h2>Por pagar</h2>
+      <p>En <b>Más → Por pagar</b>: el total que debes, lo vencido, lo que vence esta semana, los cheques por cobrar, los próximos pagos, la <b>antigüedad de saldos</b> y lo que debes a cada proveedor, con <b>Descargar para Excel</b>.</p>
+      <h2>Portal del proveedor</h2>
+      <p>Módulo aparte. Cada proveedor tiene un enlace sin contraseña: ve sus eventos con la dirección y la hora de llegada, confirma las órdenes de compra, <b>sube su factura</b>, ve sus pagos y su saldo y marca <b>«Ya llegué»</b> el día del evento.</p>
+      <h2>Incidencias y puntaje</h2>
+      <p>Módulo aparte. En <b>Más → Incidencias</b> reportas un problema (qué pasó, gravedad, área, proveedor, quién lo resuelve y foto) y lo sigues hasta resolverlo; puede llevar costo y descuento al proveedor. El puntaje de cada proveedor junta calificación, puntualidad, cumplimiento e incidencias; en <b>Cómo se calcula el puntaje</b> el dueño cambia los pesos y ve una vista previa.</p>
+    </div>
+    <figure class="cel"><img src="capturas/27_portal_proveedor_celular.png" alt=""><figcaption>El portal del DJ.</figcaption></figure>
+  </div>
+  <figure class="pc"><img src="capturas/26_por_pagar.png" alt=""><figcaption>Por pagar: vencido, esta semana, cheques y antigüedad de saldos.</figcaption></figure>
+</section>
+
+<section class="cap" id="c17">
+  <h1><span class="num">17</span> Reportes y metas</h1>
+  <span class="plan">Base · metas, conversión, ganancia y comisiones con «Metas y reportes avanzados» · descargas con «Exportar»</span>
+  <p>En <b>Más → Reportes</b> eliges el periodo (<b>Este mes</b>, <b>Mes pasado</b>, <b>Este año</b> u <b>Otras fechas</b>) y la sección. Arriba ves lo vendido, lo cobrado, lo que falta cobrar, la conversión, el ticket promedio, el precio promedio por invitado y los sábados vendidos.</p>
+  <figure class="pc m90"><img src="capturas/28_reportes.png" alt=""><figcaption>Reportes del año: ventas por mes.</figcaption></figure>
+  <table class="t">
+    <tr><th style="width:22%">Sección</th><th>Qué muestra</th></tr>
+    <tr><td>Ventas</td><td>Lo vendido por mes (un evento cuenta como vendido el día que se separó o se confirmó), sin IVA, eventos e invitados.</td></tr>
+    <tr><td>Cobrado · Por cobrar</td><td>Los pagos por mes y lo que falta pagar de cada evento, con lo vencido.</td></tr>
+    <tr><td>Ocupación</td><td>Sábados vendidos por mes de los próximos 12 meses y por espacio.</td></tr>
+    <tr><td>Conversión</td><td>El embudo (consultas, cotizadas, vendidas) por cómo llegaron, por tipo de evento y por vendedor, y por qué se pierden.</td></tr>
+    <tr><td>Ganancia</td><td>De cada evento del periodo: lo cobrado sin IVA, menos gastos, compras y personal.</td></tr>
+    <tr><td>Comisiones</td><td>La comisión de cada vendedor (el % se pone en Configuración → Reglas).</td></tr>
+    <tr><td>Satisfacción</td><td>El NPS, las estrellas y lo que dicen los clientes en la encuesta.</td></tr>
+    <tr><td>Metas</td><td>Lo vendido contra la meta, por mes y por vendedor, y contra el año anterior.</td></tr>
+    <tr><td>Descargas</td><td>Archivos para Excel: eventos, pagos recibidos, clientes, cuotas por cobrar y gastos.</td></tr>
+  </table>
+  <h2>Metas de ventas</h2>
+  <p>En <b>Más → Metas de ventas</b> (solo el dueño o un administrador) pones la <b>meta del local</b> de todos los meses (en dólares con IVA y, si quieres, en eventos), una meta distinta para un mes (por ejemplo diciembre) y la <b>meta de cada vendedor</b>. El avance sale en el Inicio de cada uno.</p>
+</section>
+
+<section class="cap" id="c18">
+  <h1><span class="num">18</span> Mi plan, módulos y demos</h1>
+  <span class="plan">Para el dueño y los administradores</span>
+  <p>En <b>Más → Mi plan</b> ves tu plan, hasta cuándo está pagado y <b>tus módulos</b>, agrupados en Ventas y contratos, Portal del cliente, Día del evento, Proveedores y gestión, Avisos y conexiones, y Extras (el <b>Asistente IA</b>: viene incluido en el plan Completo; en el Básico dice «Pídalo y le cotizamos»). Cada uno dice si está encendido e incluido en tu plan.</p>
+  <p>En el plan <b>Básico</b>, arriba dice <b>«Tu plan trae 3 módulos a tu elección»</b> y cuántos te quedan por elegir. Los que elegiste dicen <b>«Incluido · lo elegiste»</b>; si sumas más, dicen <b>«Extra»</b> con lo que pagas por ellos. Mientras te queden por elegir, los módulos que no tienes dicen <b>«Puedes elegirlo en tu plan»</b>: toca <b>Elegir este módulo</b> y Tukán lo enciende. El Asistente IA no cuenta entre los 3. En el plan <b>Completo</b> ya tienes todo.</p>
+  <figure class="pc m90"><img src="capturas/33_mi_plan_modulos.png" alt=""><figcaption>Mi plan: los módulos de la Quinta Demo Tukanec.</figcaption></figure>
+  <ul class="lista">
+    <li>Cuando ya elegiste tus módulos (o en el Completo), los que no tienes dicen «Precio por cotización». Para sumar uno, toca <b>Pedir cotización</b>: el pedido le llega a Tukán, que te escribe con el valor y para activarlo.</li>
+    <li>Si entras a una pantalla de un módulo apagado, verás «Este módulo no está en tu plan» con los botones <b>Pedir cotización</b> y <b>Ver Mi plan</b>. Si no eres el dueño ni administrador, la pantalla te pide que se lo digas al dueño.</li>
+    <li>Para cambiar de plan, toca <b>Pedir cotización</b> en el plan que quieres; para renovar o cualquier pregunta, <b>Preguntar por WhatsApp</b>: Tukán te manda tu cotización y los datos para pagar.</li>
+  </ul>
+  <h2>Cómo funcionan las demos</h2>
+  <ul class="lista">
+    <li>No hay registro abierto: quien quiere conocer TuRenta toca <b>Solicitar demo</b> y llena el nombre de su salón, quinta o hacienda, su nombre, ciudad, WhatsApp, correo, qué necesita y los módulos que le interesan.</li>
+    <li>Tukán prepara la demo con <b>datos de ejemplo</b> (espacios, catálogo, paquetes, contrato, tareas y mobiliario) y con <b>todos los módulos encendidos</b> por los días que acuerden. Te llegan tu correo y tu contraseña.</li>
+    <li>Arriba de cada pantalla ves cuántos días te quedan. Al terminar, la cuenta dice «Tu demo terminó» y tus datos quedan guardados hasta que contrates.</li>
+  </ul>
+</section>
+
+<section class="cap" id="c19">
+  <h1><span class="num">19</span> Ayuda e inteligencia artificial</h1>
+  <span class="plan">Ayuda: base (todos los planes y todos los cargos) · Asistente IA: incluido en Completo, se pide aparte en el Básico</span>
+  <h2>La Ayuda: «¿Qué necesita hacer?»</h2>
+  <p>En <b>Más → Ayuda</b> (en la computadora, abajo del menú de la izquierda) escribe lo que quieres hacer, como lo dirías por WhatsApp, y toca <b>Preguntar</b>. La respuesta sale al instante, paso a paso, con lo que dice este manual.</p>
+  <ol class="pasos">
+    <li>Escribe tu pregunta en el cuadro <b>¿Qué necesita hacer?</b> (hasta 500 letras). Por ejemplo: «¿Cómo registro un pago?» o «¿Cómo envío la cotización por WhatsApp?».</li>
+    <li>Toca <b>Preguntar</b> y lee la respuesta. Una pregunta a la vez funciona mejor.</li>
+    <li>Si no te sirvió, toca <b>escríbanos por WhatsApp 098 366 2181</b>: te ayudamos nosotros.</li>
+  </ol>
+  <figure class="pc m90"><img src="capturas/36_ayuda.png" alt=""><figcaption>Ayuda: la pregunta y su respuesta.</figcaption></figure>
+  <div class="consejo"><b>Respuestas para todos</b>Las preguntas que ya se hicieron quedan guardadas y Tukán las revisa: si alguien pregunta lo mismo, la respuesta sale de inmediato. Puedes hacer hasta 10 preguntas por minuto.</div>
+  <h2>Módulo Asistente IA: cotización a partir de un mensaje</h2>
+  <p>Con el módulo <b>Asistente IA</b> (viene incluido en el plan <b>Completo</b>; en el Básico se pide en <b>Mi plan</b> y Tukán te lo cotiza; no cuenta entre los 3 módulos que eliges) ya no copias a mano lo que el cliente te escribió. En <b>Eventos</b> o en <b>Nuevo evento</b> toca <b>✨ Desde un mensaje de WhatsApp</b>:</p>
+  <ol class="pasos">
+    <li>Copia el mensaje del cliente desde WhatsApp y pégalo en <b>Mensaje del cliente</b>. Por ejemplo: «Hola, quisiera cotizar una boda de 150 personas el 14 de febrero, con DJ y fotógrafo».</li>
+    <li>Toca <b>Proponer la cotización</b>. TuRenta lee el mensaje y te arma un <b>borrador</b>: el cliente (nombre, celular, correo), el tipo de evento, la fecha, las horas, los invitados, el espacio, el paquete y los productos de <b>tu propio catálogo</b> con tus precios. Lo que pidió y no tienes en el catálogo va en las notas, y lo que falta preguntarle sale en <b>Falta preguntarle al cliente</b>.</li>
+    <li>Revisa y corrige lo que haga falta (puedes quitar productos con la casilla <b>Usar</b> o cambiar la cantidad) y toca <b>Guardar evento y cotización</b>. Se crea el evento como <b>Consulta</b> y su cotización en borrador; ahí la terminas y la envías como siempre (capítulo 10). Nada se le manda al cliente hasta que tú lo envías.</li>
+  </ol>
+  <figure class="pc m90"><img src="capturas/37_cotizacion_mensaje.png" alt=""><figcaption>Cotización desde un mensaje: pega el texto del cliente.</figcaption></figure>
+  <ul class="lista">
+    <li>Si la fecha y el espacio ya están separados por otro evento, TuRenta te avisa igual que en un evento nuevo (puedes guardarlo como consulta en lista de espera).</li>
+    <li>Si en algún momento no se puede leer el mensaje automáticamente, verás: «En este momento no pudimos procesar el texto automáticamente; puede hacerlo a mano aquí» con el enlace a <b>Nuevo evento</b>.</li>
+    <li>Sin el módulo, el botón no aparece y la Ayuda sigue funcionando igual.</li>
+  </ul>
+</section>
+
+<section class="cap faq" id="c20">
+  <h1><span class="num">20</span> Preguntas frecuentes</h1>
+  <h3>¿Dos vendedores pueden vender la misma fecha?</h3>
+  <p>No. Un espacio separado o confirmado no se puede volver a separar en el mismo horario (con montaje y desmontaje): lo impide la base de datos. Lo que sí puede haber son varias consultas o cotizaciones para la misma fecha; la primera que paga la reserva se queda con ella.</p>
+  <h3>¿Cuándo queda separada la fecha?</h3>
+  <p>Cuando lo pagado completa la reserva. Mientras está cotizada, la fecha solo queda retenida unos días (los que pusiste en Reglas). Para darle más tiempo al cliente, en el Resumen del evento elige los días y toca <b>Retener</b>.</p>
+  <h3>Un cliente pagó por transferencia y subió la foto. ¿Ya cuenta?</h3>
+  <p>Todavía no. Revisa en tu banco que el dinero llegó y toca <b>Confirmar: el dinero llegó</b> en Cobros o en la pestaña Pagos. Recién ahí suma a lo pagado.</p>
+  <h3>Me equivoqué al registrar un pago.</h3>
+  <p>Toca <b>Anular</b> en ese pago y escribe el motivo. No se borra: queda en el historial para que las cuentas cuadren.</p>
+  <h3>El cliente quiere cambiar la cotización después de aceptarla.</h3>
+  <p>Haz una <b>Nueva versión</b>. Si ya hay contrato firmado y el cambio es importante, anula el contrato y genera uno nuevo. Si solo suma extras pedidos desde el portal, al aprobarlos se prepara un anexo.</p>
+  <h3>¿El coordinador ve cuánto paga el cliente?</h3>
+  <p>No. El coordinador organiza el día (cronograma, personal, proveedores, invitados, mobiliario y plano) pero no ve Cobros, ni la cotización, el contrato o los pagos.</p>
+  <h3>Olvidé mi contraseña.</h3>
+  <p>Pídele al dueño o a un administrador que en <b>Usuarios</b> te dé una <b>Nueva contraseña</b>. Si eres el dueño, escríbenos por WhatsApp.</p>
+  <h3>¿TuRenta hace facturas electrónicas?</h3>
+  <p>No. TuRenta hace cotizaciones, contratos, recibos y estados de cuenta. Sí lee el XML de las facturas que te mandan tus proveedores.</p>
+  <h3>¿Se puede usar sin internet?</h3>
+  <p>Necesita internet, pero funciona con los datos del celular. Instálalo como app para abrirlo más rápido.</p>
+  <h3>¿Dónde pregunto cómo se hace algo?</h3>
+  <p>En <b>Más → Ayuda</b>: escribe tu pregunta y toca <b>Preguntar</b> (capítulo 19). Si no te sirve, escríbenos por WhatsApp.</p>
+  <h3>Si apagamos un módulo, ¿pierdo la información?</h3>
+  <p>No. Se esconden sus pantallas, botones y enlaces, pero los datos quedan guardados y vuelven al encenderlo.</p>
+  <h3>¿Cuánto cuesta?</h3>
+  <p>Depende de los módulos que necesite tu local. Escríbenos y te mandamos la cotización.</p>
+  <div class="contacto"><b>¿Necesitas ayuda?</b><br>WhatsApp de Tukán: <b>098 366 2181</b> · Correo: <b>info@tukansoftware.com</b> · Web: <b>tukansoftware.com</b></div>
+</section>
+
+</body>
+</html>

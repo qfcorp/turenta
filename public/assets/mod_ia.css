@@ -1,0 +1,17 @@
+/* Ayuda e inteligencia artificial (110) · prefijo ia- */
+.ia-ayuda textarea, #form-ia-leer textarea { width: 100%; min-height: 88px; resize: vertical; }
+.ia-respuesta { border-left: 4px solid var(--verde); }
+.ia-texto { line-height: 1.55; overflow-wrap: anywhere; }
+.ia-pie { margin: 12px 0 0; color: var(--tinta-suave); font-size: .92rem; }
+.ia-consejos ul { margin: 0; padding-left: 20px; }
+#form-ia-borrador .casilla, .ia-casilla { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+#form-ia-borrador fieldset { border: 0; padding: 0; margin: 0 0 12px; }
+#form-ia-borrador legend { font-weight: 600; margin-bottom: 4px; }
+.ia-faq-resp { white-space: pre-line; max-width: 46ch; overflow-wrap: anywhere; }
+.ia-faq-form textarea { width: 100%; min-height: 110px; }
+.ia-faq-filtros { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.ia-faq-filtros a { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--linea); text-decoration: none; }
+.ia-faq-filtros a[aria-current] { background: var(--verde-claro); border-color: var(--verde); }
+.ia-correo { border-top: 1px dashed var(--linea); margin-top: 14px; padding-top: 12px; }
+.ia-correo input[type=email] { max-width: 360px; width: 100%; }
+.ia-mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85rem; background: var(--fondo, #f6f3ee); padding: 8px 10px; border-radius: 6px; overflow-x: auto; }

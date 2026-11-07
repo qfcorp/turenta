@@ -1,0 +1,49 @@
+/* TuRenta — Metas de ventas (prefijo mt-) */
+.mt-anios { display: flex; align-items: center; gap: 16px; margin: 0 0 14px; }
+.mt-anios a { text-decoration: none; font-weight: 600; padding: 6px 10px; border-radius: 8px; }
+.mt-anios a:hover { background: var(--verde-claro); }
+.mt-anios strong { font-size: 1.25rem; }
+.mt-general { display: grid; gap: 0 16px; }
+@media (min-width: 700px) { .mt-general { grid-template-columns: 2fr 1fr; max-width: 640px; } }
+.mt-tabla td { vertical-align: middle; padding: 6px 8px; }
+.mt-tabla input { width: 100%; min-width: 96px; }
+@media (max-width: 520px) { .mt-tabla th:nth-child(5), .mt-tabla td:nth-child(5) { display: none; } .mt-tabla input { min-width: 84px; } }
+.mt-tabla input.mt-chico, .mt-chico { max-width: 96px; min-width: 70px; }
+.mt-tabla tr.mt-actual td { background: #FBF6EA; }
+.mt-vmes input[type=month] { font: inherit; width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid #C7D0CC; border-radius: 8px; background: #fff; color: var(--tinta); }
+.mt-vendedores li { flex-wrap: wrap; }
+.mt-v-campos { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 8px; width: 100%; }
+@media (min-width: 700px) { .mt-v-campos { width: 320px; margin-left: auto; } }
+.mt-vmes { display: grid; gap: 0 12px; align-items: end; }
+@media (min-width: 700px) { .mt-vmes { grid-template-columns: 1.4fr 1fr 1fr .6fr auto; } .mt-vmes .boton { margin-bottom: 14px; } }
+
+/* Inicio */
+.mt-inicio { border-left: 4px solid var(--navaja); }
+.mt-inicio.mt-cumplida { border-left-color: #3E7C59; }
+.mt-cifra { margin: 2px 0 8px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.mt-cifra strong { font-size: 1.6rem; color: var(--verde-oscuro); line-height: 1.1; }
+.mt-cifra span { color: var(--tinta-suave); }
+.mt-pct { margin-left: auto; font-size: 1.15rem; color: var(--verde); }
+.mt-cumplida .mt-pct { color: #1C5A31; }
+.mt-barra { position: relative; height: 14px; background: #EFE7E9; border-radius: 99px; overflow: visible; }
+.mt-barra > span { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--verde), var(--navaja)); }
+.mt-cumplida .mt-barra > span { background: linear-gradient(90deg, #3E7C59, #6DB18A); }
+.mt-ritmo { position: absolute; top: -4px; width: 3px; height: 22px; margin-left: -1px; background: var(--verde-oscuro); border-radius: 2px; opacity: .55; }
+.mt-detalle { margin: 10px 0 2px; }
+.mt-nota { margin: 0; font-size: .88rem; }
+.mt-sube { color: #1C5A31; font-weight: 700; white-space: nowrap; }
+.mt-baja { color: var(--rojo); font-weight: 700; white-space: nowrap; }
+.mt-invitar { margin-bottom: 16px; }
+
+/* Reportes */
+.mt-tabla-rep { min-width: 620px; }
+.mt-avance { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.mt-mini { display: inline-block; width: 74px; height: 8px; background: #EFE7E9; border-radius: 99px; overflow: hidden; }
+.mt-mini > span { display: block; height: 100%; background: var(--navaja); }
+.mt-ok .mt-mini > span { background: #3E7C59; }
+.mt-ok b { color: #1C5A31; }
+.mt-cerca .mt-mini > span { background: #D4A857; }
+.mt-lejos .mt-mini > span { background: #C26A5F; }
+.mt-cifras-rep { margin-top: 4px; }
+.mt-sin-metas a { font-weight: 700; }
+.mt-tabla-rep tr.mt-futuro td { color: var(--tinta-suave); }

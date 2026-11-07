@@ -1,0 +1,18 @@
+# Credenciales y configuración local (nunca al repositorio)
+.env
+config/.env
+config/credenciales.php
+*.p12
+
+# Librerías (se instalan con composer en el servidor)
+vendor/
+
+# Archivos subidos por los negocios (fotos, comprobantes, firmas)
+uploads/
+
+# Copias de respaldo
+*.bak
+*.bak_*
+
+# Copias de los negocios borrados (papelera del Panel Tukán Central)
+respaldos/

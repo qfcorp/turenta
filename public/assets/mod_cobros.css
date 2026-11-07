@@ -1,0 +1,135 @@
+/* TuRenta — módulo Cobros y portal del cliente (todo con prefijo cb-) */
+.cb-rojo { color: var(--rojo); font-weight: 600; }
+.cb-verde { color: #1C5A31; font-weight: 600; }
+.cb-tachado { text-decoration: line-through; opacity: .6; }
+.cb-nota { background: #FBF0D3; color: #6A4D0D; border-left: 4px solid var(--navaja); padding: 8px 12px; border-radius: 8px; font-size: .92rem; }
+.cb-vacio h2 { color: var(--tinta); }
+.cb-vacio p { max-width: 520px; margin: 0 auto 12px; }
+
+/* Resumen */
+.cb-cifras .cifra-tarjeta small + strong + small { margin-top: 2px; }
+.cb-cifras .cb-revisar strong { color: #7A5300; }
+.cb-avance { margin: -4px 0 14px; }
+.cb-avance .barra { margin-bottom: 6px; }
+.cb-acciones { margin-bottom: 16px; }
+
+/* Etiquetas de estado de cuotas y pagos */
+.cb-etq { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: .76rem; font-weight: 600; white-space: nowrap; border: 1px solid transparent; }
+.cb-etq-pagada, .cb-etq-confirmado { background: var(--ok-claro); color: #1C5A31; border-color: #BFE0C9; }
+.cb-etq-parcial { background: #E5ECF7; color: #22457A; border-color: #C6D6EE; }
+.cb-etq-pendiente { background: #EEF0F4; color: #3D4659; border-color: #D8DCE6; }
+.cb-etq-vencida, .cb-etq-rechazado, .cb-etq-anulado { background: var(--rojo-claro); color: #7E2A23; border-color: #F0C9C3; }
+.cb-etq-por_revisar { background: #FFF4D9; color: #7A5300; border-color: #F2DCA2; }
+.cb-tabla-cuotas tr.cb-cuota-vencida td:first-child { box-shadow: inset 3px 0 0 var(--rojo); }
+.cb-tabla-cuotas tr.cb-cuota-pagada td { color: var(--tinta-suave); }
+
+/* Formularios plegables */
+.cb-detalles { border: 1px solid var(--linea); border-radius: 8px; padding: 0 12px; margin-top: 10px; background: #FCFAFA; }
+.cb-detalles > summary { cursor: pointer; padding: 10px 0; font-weight: 600; color: var(--verde); list-style: none; }
+.cb-detalles > summary::-webkit-details-marker { display: none; }
+.cb-detalles > summary::before { content: '▸ '; }
+.cb-detalles[open] > summary::before { content: '▾ '; }
+.cb-detalles[open] { padding-bottom: 12px; }
+.cb-plan-acciones { display: grid; gap: 0; }
+.cb-fila-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.cb-fila-form input[type=text] { flex: 1 1 200px; width: auto; }
+.cb-boton-enlace { background: none; border: 0; padding: 0; font: inherit; color: var(--rojo); cursor: pointer; text-decoration: underline; font-size: .85rem; }
+
+/* Plan a mano */
+.cb-plan-fila { display: grid; grid-template-columns: 1fr; gap: 0 10px; border-bottom: 1px dashed var(--linea); padding-top: 6px; }
+@media (min-width: 640px) { .cb-plan-fila { grid-template-columns: 2fr 1.3fr 1fr; } .cb-plan-fila .campo { margin-bottom: 8px; } .cb-plan-fila + .cb-plan-fila label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+.cb-suma { font-weight: 600; margin: 10px 0; }
+.cb-suma.cb-mal { color: var(--rojo); }
+.cb-suma.cb-bien { color: #1C5A31; }
+
+/* Comprobantes por revisar */
+.cb-por-revisar { border-color: #F2DCA2; background: #FFFCF3; }
+.cb-comprobante { display: grid; grid-template-columns: 96px 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--linea); }
+.cb-comprobante:first-of-type { border-top: 0; }
+.cb-foto img { width: 96px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--linea); background: #eee; display: block; }
+.cb-monto { font-size: 1.3rem; font-weight: 700; margin: 0; }
+.cb-comprobante-datos p { margin-bottom: 4px; }
+.cb-revisar-izq { display: flex; gap: 10px; align-items: center; }
+.cb-mini img { width: 44px; height: 54px; object-fit: cover; border-radius: 6px; border: 1px solid var(--linea); display: block; }
+
+/* Lista de pagos */
+.cb-pagos .derecha { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.cb-pago-acciones { display: flex; flex-wrap: wrap; gap: 4px 10px; justify-content: flex-end; align-items: center; }
+.cb-pago-anulado, .cb-pago-rechazado { opacity: .75; }
+.cb-nuevo { animation: cb-brillo 2.4s ease-out 1; }
+@keyframes cb-brillo { from { background: #FFF4D9; } to { background: transparent; } }
+.cb-anular { margin-top: 0; padding: 0 8px; background: transparent; border-color: transparent; }
+.cb-anular > summary { padding: 0; font-weight: 500; color: var(--rojo); font-size: .85rem; }
+.cb-anular > summary::before { content: ''; }
+.cb-anular[open] { border-color: var(--linea); background: #FCFAFA; padding: 4px 8px 8px; }
+.cb-garantia { margin-bottom: 10px; }
+
+/* Ganancia */
+.cb-sin-minimo table { min-width: 0; }
+.cb-ganancia td:first-child { color: var(--tinta-suave); }
+.cb-ganancias { margin-top: 12px; margin-bottom: 0; }
+.cb-caja { border: 1px solid var(--linea); border-radius: var(--radio); padding: 12px 14px; background: #FCFAFA; }
+.cb-caja h3 { margin-bottom: 2px; }
+.cb-caja .suave { font-size: .85rem; }
+
+/* Tablero de cobros */
+.cb-cobros > li { flex-wrap: wrap; align-items: flex-start; }
+.cb-cobro-datos { display: flex; flex-direction: column; min-width: 0; flex: 1 1 220px; }
+.cb-cobro-datos a { text-decoration: none; }
+.cb-cobro-lado { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.cb-cobro-botones { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.cb-cobro-botones form { margin: 0; }
+.cb-cobro-vencida .monto { color: var(--rojo); }
+.cb-pago-rapido { flex-basis: 100%; display: grid; grid-template-columns: 1fr; gap: 0 10px; background: var(--verde-claro); border-radius: 8px; padding: 10px 12px; align-items: end; }
+@media (min-width: 640px) { .cb-pago-rapido { grid-template-columns: 1fr 1fr 1.3fr auto; } .cb-pago-rapido .campo { margin-bottom: 0; } }
+.cb-titulo-filtro { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.cb-titulo-filtro h2 { margin: 0; }
+.cb-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.cb-chips a { border: 1px solid var(--linea); border-radius: 999px; padding: 4px 12px; text-decoration: none; color: var(--tinta); font-size: .88rem; background: #fff; }
+.cb-chips a small { color: var(--tinta-suave); margin-left: 4px; }
+.cb-chips a.activo { background: var(--verde); border-color: var(--verde); color: #fff; }
+.cb-chips a.activo small { color: #F4E8EA; }
+
+/* Mensajes de hoy */
+.cb-contador { display: inline-block; min-width: 24px; padding: 0 7px; border-radius: 999px; background: var(--verde); color: #fff; font-size: .8rem; text-align: center; vertical-align: middle; }
+.cb-mensajes { list-style: none; margin: 0; padding: 0; }
+.cb-mensaje { border-top: 1px solid var(--linea); padding: 12px 0; display: grid; gap: 6px; }
+.cb-mensaje:first-child { border-top: 0; }
+.cb-mensaje-cabeza small { display: block; }
+.cb-mensaje .cb-cobro-botones { justify-content: flex-start; }
+.cb-mensaje.cb-hecho { opacity: .55; }
+.cb-texto > summary { cursor: pointer; color: var(--verde); font-size: .88rem; }
+.cb-texto p { background: #E7F6EC; border-radius: 10px 10px 10px 2px; padding: 10px 12px; margin: 6px 0 0; font-size: .92rem; white-space: pre-wrap; max-width: 560px; }
+.cb-sin-tel { font-size: .85rem; color: var(--rojo); align-self: center; }
+
+/* Portal del cliente */
+.cb-portal-cabeza .cb-logo { width: 54px; height: 54px; margin: 0; }
+.cb-hero { text-align: center; padding: 26px 18px 22px; }
+.cb-hero .cb-saludo { margin: 0 0 4px; font-size: 1.05rem; }
+.cb-hero-titulo { color: #fff; font-size: 1.6rem; margin-bottom: 4px; }
+.cb-hero-fecha { margin-bottom: 14px; }
+.cb-cuenta { display: inline-flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; justify-content: center; }
+.cb-cuenta > span, .cb-cuenta > strong { background: rgba(255,255,255,.15); border-radius: 10px; padding: 8px 12px; min-width: 70px; }
+.cb-cuenta strong { display: block; font-size: 1.6rem; line-height: 1.1; color: #fff; }
+.cb-cuenta small { color: rgba(255,255,255,.85); }
+.cb-estado-cliente { margin: 0; }
+.cb-estado-cliente .ev-estado { white-space: normal; }
+.cb-ficha { grid-template-columns: 90px 1fr; }
+.cb-pct { margin-top: 6px; }
+.cb-cuotas-portal .derecha { text-align: right; }
+.cb-datos-banco { white-space: pre-line; background: #F6F3F2; border-radius: 8px; padding: 10px 12px; }
+.cb-separado { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--linea); }
+.cb-tarjeta { background: #FCFAFA; border: 1px solid var(--linea); border-radius: 10px; padding: 12px 14px; }
+.cb-cajita .cb-pp { margin: 12px 0; min-height: 60px; }
+.cb-cronograma { list-style: none; margin: 0 0 8px; padding: 0; }
+.cb-cronograma li { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--linea); }
+.cb-cronograma li:last-child { border-bottom: 0; }
+.cb-vivo { border-color: #F0C9C3; }
+.cb-cifras-portal { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+.cb-privado { font-size: .8rem; margin: 10px 0 0; }
+@media print { .cb-detalles, .cb-cobro-botones, .cb-pago-acciones { display: none !important; } }
+@media (max-width: 600px) {
+    .cb-revisar-fila { flex-wrap: wrap; }
+    .cb-revisar-fila .cb-revisar-izq { flex: 1 1 100%; }
+    .cb-revisar-fila .derecha { flex: 1 1 100%; display: flex; justify-content: space-between; align-items: center; }
+}

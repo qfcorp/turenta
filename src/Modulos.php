@@ -53,7 +53,7 @@ final class Modulos
         'paquetes' => ['Paquetes y simulador', '🎁', 'Paquetes armados (Boda Oro, Quince años…) que cargan toda la cotización en un toque, con simulador de precio por número de invitados.', 3.0, [], 'ventas'],
         'contratos' => ['Contratos con firma', '✍️', 'Contrato con tu plantilla y variables que el cliente firma con el dedo en su celular, con huella y QR de verificación. Anexos por extras.', 6.0, [], 'ventas'],
         'portal_cliente' => ['Portal del cliente', '📱', 'Tu cliente tiene su propio enlace, sin claves: ve sus pagos, su contrato y sube comprobantes de transferencia.', 6.0, [], 'cliente'],
-        'cobros_linea' => ['Cobros en línea (Payphone)', '💳', 'Tu cliente paga sus cuotas con tarjeta desde el portal y el pago se registra solo.', 4.0, ['portal_cliente'], 'cliente'],
+        'cobros_linea' => ['Cobros en línea (Stripe o Payphone)', '💳', 'Tu cliente paga sus cuotas con tarjeta desde el portal y el pago se registra solo.', 4.0, ['portal_cliente'], 'cliente'],
         'cuestionarios' => ['Formulario, extras y encuesta', '📝', 'Formulario del evento que el cliente llena en su portal, extras que pide en línea (hora extra, fotocabina…) y encuesta de satisfacción con NPS y reseña en Google.', 5.0, ['portal_cliente'], 'cliente'],
         'dia_evento' => ['Día del evento', '⏱️', 'Cronograma minuto a minuto con modo en vivo, personal del evento con su portal y confirmación, hoja del evento en PDF para todo el equipo.', 8.0, [], 'dia'],
         'invitados' => ['Invitados con QR', '🎟️', 'Invitación digital con confirmación, mesas, pegar la lista, portal de invitados para los novios y control de ingreso con QR en la puerta.', 8.0, [], 'dia'],
@@ -103,7 +103,8 @@ final class Modulos
         'cotizacion' => '', 'cot' => '', 'paquetes' => 'paquetes',
         'contrato' => 'contratos', 'firmar' => 'contratos', 'firmar_anexo' => 'contratos',
         'portal' => 'portal_cliente', 'portal_pagar' => 'portal_cliente',
-        'payphone' => 'cobros_linea',
+        'payphone' => 'cobros_linea', 'stripe' => 'cobros_linea', 'stripe_webhook' => 'cobros_linea',
+        'reservar' => 'portal_cliente',
         'portal_cuestionario' => 'cuestionarios', 'portal_extras' => 'cuestionarios', 'encuesta' => 'cuestionarios',
         'evento_formulario' => 'cuestionarios', 'cuestionarios' => 'cuestionarios', 'extras' => 'cuestionarios',
         'evento_dia' => 'dia_evento', 'vivo' => 'dia_evento', 'staff' => 'dia_evento', 'personal' => 'dia_evento',
@@ -122,7 +123,7 @@ final class Modulos
     ];
 
     /** Rutas de un módulo que el router NO corta: Payphone vuelve con pagos ya iniciados (no se pueden perder). */
-    public const SIN_CORTE = ['payphone'];
+    public const SIN_CORTE = ['payphone', 'stripe', 'stripe_webhook'];
 
     /** Módulo de cada PDF (/?r=pdf&tipo=…). */
     public const PDFS = [

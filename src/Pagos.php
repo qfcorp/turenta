@@ -18,7 +18,7 @@ use RuntimeException;
 final class Pagos
 {
     public const METODOS = ['efectivo' => 'Efectivo', 'transferencia' => 'Transferencia', 'deuna' => 'DeUna', 'tarjeta' => 'Tarjeta',
-                            'payphone' => 'Payphone', 'cheque' => 'Cheque', 'otro' => 'Otro'];
+                            'payphone' => 'Payphone', 'stripe' => 'Stripe (tarjeta)', 'cheque' => 'Cheque', 'otro' => 'Otro'];
     public const TIPOS = ['evento' => 'Pago del evento', 'garantia' => 'Garantía recibida',
                           'devolucion_garantia' => 'Garantía devuelta', 'cargo_danos' => 'Garantía retenida por daños'];
     public const ESTADOS = ['confirmado' => 'Confirmado', 'por_revisar' => 'Por revisar', 'rechazado' => 'Rechazado',

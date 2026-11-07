@@ -9,7 +9,7 @@ declare(strict_types=1);
 define('RAIZ', dirname(__DIR__, 3));
 date_default_timezone_set('America/Guayaquil');
 spl_autoload_register(function (string $c): void {
-    if (str_starts_with($c, 'TuRenta\\') && is_file($f = RAIZ . '/src/' . substr($c, 9) . '.php')) require $f;
+    if (str_starts_with($c, 'TuRenta\\') && is_file($f = RAIZ . '/src/' . substr($c, 8) . '.php')) require $f;
 });
 if (is_file(RAIZ . '/vendor/autoload.php')) require RAIZ . '/vendor/autoload.php';
 $base = (string) getenv('TURENTA_DB_NAME');

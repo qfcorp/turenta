@@ -15,7 +15,8 @@
 ## 7 nov 2026 — Respuesta del hermano (Zombie Ice) a la propuesta
 - Le gustó: velocidad (WebP, menos fuentes), barra fija Call/Text/Book en celular, páginas por fiesta con las mismas URL (no pierde Google).
 - Aclaración enviada: la reserva con Stripe **ya está hecha** en TuRenta (modo prueba); el dinero va a **su propia cuenta de Stripe**.
-- Su regla: el pie con crédito a **Foam Office** se queda (es a propósito). TuRenta se ofrece como complemento, no para quitar Foam Office, salvo que él decida.
+- El sistema de reservas de **Foam Office** lo hizo el propio hermano con su IA. El pie con crédito a Foam Office se queda (es a propósito).
+  TuRenta **no** se le vende para reemplazarlo: se comparan ideas entre los dos sistemas (llamada para mostrarse ambos).
 - Pendiente:
   - [ ] Poner **contraseña** a la vista previa `zombieice.qfproducciones.com` mientras no contraten (el formulario funciona y un cliente real podría creer que reservó).
   - [ ] Cuando acepten: avisos de reservas al correo de Zombie Ice (`info@zombieice.com`), no al de la demo (`produccion@qfproducciones.com`).

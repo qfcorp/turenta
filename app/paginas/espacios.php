@@ -70,7 +70,7 @@ if (es_post()) {
         if ($accion === 'guardar') {
             $error = $e->getMessage();
             $form = array_map(fn($v) => is_string($v) ? $v : '', $_POST) + ['nombre' => '', 'descripcion' => '', 'capacidad_banquete' => '',
-                     'capacidad_coctel' => '', 'precio_base' => '', 'color' => '#6B2D3C', 'orden' => ''];
+                     'capacidad_coctel' => '', 'precio_base' => '', 'color' => '#6B2D3C', 'orden' => '', 'montaje_min' => '', 'desmontaje_min' => ''];
             $editarId = $id ?? 0;
         } else {
             aviso($e->getMessage(), 'error');
@@ -88,7 +88,7 @@ if ($form === null) {
         $form = $esp;
     } elseif (isset($_GET['nuevo']) && $puedeAgregar) {
         $form = ['id' => '', 'nombre' => '', 'descripcion' => '', 'capacidad_banquete' => '', 'capacidad_coctel' => '', 'precio_base' => '',
-                 'color' => '#3E7C59', 'orden' => $activos + 1, 'foto' => null];
+                 'color' => '#3E7C59', 'orden' => $activos + 1, 'foto' => null, 'montaje_min' => '', 'desmontaje_min' => ''];
     } else {
         $editarId = 0;
     }
@@ -100,5 +100,5 @@ if ($form === null) {
 vista('espacios', [
     'espacios' => $espacios, 'activos' => $activos, 'max' => $max, 'puedeAgregar' => $puedeAgregar, 'puedeEditar' => $puedeEditar,
     'form' => $puedeEditar ? $form : null, 'error' => $error, 'cerradas' => $ventas->fechasCerradas($nid),
-    'hoyTxt' => date('Y-m-d'),
+    'hoyTxt' => date('Y-m-d'), 'montajeNegocio' => (new \TuRenta\Eventos(db()))->minutosMontaje($nid),
 ], 'Espacios · TuRenta');

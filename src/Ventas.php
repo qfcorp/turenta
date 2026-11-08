@@ -701,6 +701,9 @@ final class Ventas
         $banquete = $num($d['capacidad_banquete'] ?? '', 'Revisa la capacidad sentados (solo números).', 20000);
         $coctel = $num($d['capacidad_coctel'] ?? '', 'Revisa la capacidad de pie (solo números).', 20000);
         $orden = $num($d['orden'] ?? '', 'El orden debe ser un número.', 999) ?? 0;
+        // (201) Montaje y desmontaje propios del equipo; vacío = las horas de Reglas
+        $montajeMin = $num($d['montaje_min'] ?? '', 'Revisa los minutos de montaje (solo números, hasta 1440).', 1440);
+        $desmontajeMin = $num($d['desmontaje_min'] ?? '', 'Revisa los minutos de desmontaje (solo números, hasta 1440).', 1440);
         try {
             $precio = round(self::numeroTexto($d['precio_base'] ?? '') ?? 0.0, 2);
         } catch (RuntimeException) {
@@ -720,13 +723,58 @@ final class Ventas
             $st = $this->db->prepare('INSERT INTO espacios (negocio_id, nombre, descripcion, capacidad_banquete, capacidad_coctel, precio_base, color, orden)
                                       VALUES (?,?,?,?,?,?,?,?) RETURNING id');
             $st->execute([$negocioId, mb_substr($nombre, 0, 80), $desc, $banquete, $coctel, $precio, $color, $orden]);
-            return (int) $st->fetchColumn();
+            $nuevo = (int) $st->fetchColumn();
+            $this->db->prepare('UPDATE espacios SET montaje_min = ?, desmontaje_min = ? WHERE id = ?')->execute([$montajeMin, $desmontajeMin, $nuevo]);
+            return $nuevo;
         }
-        $st = $this->db->prepare('UPDATE espacios SET nombre = ?, descripcion = ?, capacidad_banquete = ?, capacidad_coctel = ?, precio_base = ?, color = ?, orden = ?
-                                   WHERE id = ? AND negocio_id = ?');
-        $st->execute([mb_substr($nombre, 0, 80), $desc, $banquete, $coctel, $precio, $color, $orden, $id, $negocioId]);
-        if ($st->rowCount() !== 1) throw new RuntimeException('No se encontró el espacio.');
+        $st = $this->db->prepare('SELECT montaje_min, desmontaje_min FROM espacios WHERE id = ? AND negocio_id = ?');
+        $st->execute([$id, $negocioId]);
+        $antes = $st->fetch();
+        $propia = !$this->db->inTransaction();
+        if ($propia) $this->db->beginTransaction();
+        try {
+            $st = $this->db->prepare('UPDATE espacios SET nombre = ?, descripcion = ?, capacidad_banquete = ?, capacidad_coctel = ?, precio_base = ?, color = ?, orden = ?,
+                                             montaje_min = ?, desmontaje_min = ?
+                                       WHERE id = ? AND negocio_id = ?');
+            $st->execute([mb_substr($nombre, 0, 80), $desc, $banquete, $coctel, $precio, $color, $orden, $montajeMin, $desmontajeMin, $id, $negocioId]);
+            if ($st->rowCount() !== 1) throw new RuntimeException('No se encontró el espacio.');
+            $cambio = $antes && ((string) $antes['montaje_min'] !== (string) $montajeMin || (string) $antes['desmontaje_min'] !== (string) $desmontajeMin);
+            if ($cambio) $this->recalcularPeriodos($negocioId, $id);
+            if ($propia) $this->db->commit();
+        } catch (\Throwable $e) {
+            if ($propia && $this->db->inTransaction()) $this->db->rollBack();
+            throw $e;
+        }
         return $id;
+    }
+
+    /**
+     * (201) Cambió el montaje o desmontaje de un equipo: los eventos de hoy en adelante con ese equipo vuelven a calcular
+     * cuánto lo ocupan. Si con los minutos nuevos dos eventos separados se cruzan, no se guarda y se dice cuál.
+     */
+    private function recalcularPeriodos(int $negocioId, int $espacioId): void
+    {
+        $eventos = new Eventos($this->db);
+        $st = $this->db->prepare("SELECT e.id, e.codigo, e.fecha, e.hora_inicio, e.hora_fin, e.viaje_min FROM evento_espacios ee JOIN eventos e ON e.id = ee.evento_id
+                                   WHERE ee.negocio_id = ? AND ee.espacio_id = ? AND e.fecha >= CURRENT_DATE - 1
+                                     AND e.estado NOT IN ('perdido','cancelado') ORDER BY e.fecha, e.hora_inicio");
+        $st->execute([$negocioId, $espacioId]);
+        $up = $this->db->prepare('UPDATE evento_espacios SET periodo = tsrange(?::timestamp, ?::timestamp) WHERE evento_id = ? AND espacio_id = ?');
+        foreach ($st->fetchAll() as $ev) {
+            [$desde, $hasta] = $eventos->periodo($negocioId, $ev['fecha'], (string) $ev['hora_inicio'], (string) $ev['hora_fin'], (int) $ev['viaje_min'], $espacioId);
+            $this->db->exec('SAVEPOINT recalcular');
+            try {
+                $up->execute([$desde, $hasta, $ev['id'], $espacioId]);
+                $this->db->exec('RELEASE SAVEPOINT recalcular');
+            } catch (\PDOException $e) {
+                $this->db->exec('ROLLBACK TO SAVEPOINT recalcular');
+                if ($e->getCode() === '23P01') {
+                    throw new RuntimeException("Con esos minutos de montaje y desmontaje, el evento {$ev['codigo']} del " . self::fechaTexto($ev['fecha'])
+                        . ' se cruzaría con otro evento ya separado en este equipo. Baja los minutos o mueve uno de los dos eventos.');
+                }
+                throw $e;
+            }
+        }
     }
 
     /** Pone la foto (nombre de archivo ya guardado con Fotos::guardarImagen). Devuelve la foto anterior para borrarla. */

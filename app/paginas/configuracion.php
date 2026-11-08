@@ -49,6 +49,10 @@ if (es_post()) {
                 $config->guardarReserva($nid, $_POST);
                 aviso('Reserva en línea y Stripe guardados.');
                 break;
+            case 'viaje':
+                $config->guardarViaje($nid, $_POST);
+                aviso('Tiempo de viaje guardado. Las horas de la reserva en línea ya cuentan el viaje hasta cada dirección.');
+                break;
             case 'tarea':
                 $id = (int) ($_POST['id'] ?? 0);
                 $config->guardarTarea($nid, $_POST, $id ?: null);
@@ -81,7 +85,7 @@ if (es_post()) {
         }
     } catch (RuntimeException $e) {
         aviso($e->getMessage(), 'error');
-        if (in_array($accion, ['datos', 'reglas', 'cobros', 'reserva'], true)) $_SESSION['config_form'] = [$accion => $_POST];
+        if (in_array($accion, ['datos', 'reglas', 'cobros', 'reserva', 'viaje'], true)) $_SESSION['config_form'] = [$accion => $_POST];
     }
     redirigir('configuracion', ['tab' => $volver]);
 }
@@ -92,7 +96,7 @@ $previo = $_SESSION['config_form'] ?? [];
 unset($_SESSION['config_form']);
 foreach ($previo as $grupo => $valores) {
     foreach ((array) $valores as $k => $v) {
-        if (array_key_exists($k, $negocio) && !in_array($k, ['payphone_token', 'stripe_secret_key', 'stripe_webhook_secret', 'csrf', 'id', 'token_ical'], true)) $negocio[$k] = $v;
+        if (array_key_exists($k, $negocio) && !in_array($k, ['payphone_token', 'stripe_secret_key', 'stripe_webhook_secret', 'google_maps_key', 'csrf', 'id', 'token_ical'], true)) $negocio[$k] = $v;
     }
 }
 $tareas = $tab === 'tareas' ? $config->tareas($nid) : [];

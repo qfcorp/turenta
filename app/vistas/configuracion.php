@@ -225,8 +225,9 @@ $num = fn(string $k) => e(rtrim(rtrim(number_format((float) $n[$k], 2, '.', ''),
         <div class="campo"><label for="reserva_paso_min">Cada cuántos minutos</label>
             <input type="number" id="reserva_paso_min" name="reserva_paso_min" min="10" max="240" step="5" value="<?= (int) $n['reserva_paso_min'] ?>"></div>
     </div>
-    <p class="g-nota">El tiempo de viaje e instalación antes y después de cada fiesta sale de <strong>Reglas → horas de montaje y desmontaje</strong>.
-        El depósito es el <strong>% de reserva</strong> de Reglas.</p>
+    <p class="g-nota">Antes y después de cada fiesta el equipo queda ocupado por el <strong>montaje y desmontaje</strong> (los de cada equipo en
+        <strong>Espacios</strong>, o si no los tiene, las horas de <strong>Reglas</strong>) y, con el <strong>tiempo de viaje con mapa</strong> (abajo),
+        también por el viaje desde tu base hasta la fiesta y de vuelta. El depósito es el <strong>% de reserva</strong> de Reglas.</p>
     <div class="campo"><label for="reserva_condiciones">Condiciones que acepta el cliente</label>
         <textarea id="reserva_condiciones" name="reserva_condiciones" rows="5" maxlength="5000" placeholder="Deposit is non-refundable within 7 days of the party. Rain dates…"><?= $f('reserva_condiciones') ?></textarea></div>
     <div class="fila-campos">
@@ -264,6 +265,59 @@ $num = fn(string $k) => e(rtrim(rtrim(number_format((float) $n[$k], 2, '.', ''),
         <div class="casillas" style="margin-bottom:14px"><label><input type="checkbox" name="quitar_stripe" value="1"> Quitar Stripe (dejar de cobrar con tarjeta)</label></div>
     <?php endif; ?>
     <button class="boton" type="submit">Guardar reserva en línea y Stripe</button>
+</form>
+
+<?php $conGoogle = trim((string) ($n['google_maps_key'] ?? '')) !== ''; ?>
+<form class="bloque" method="post" action="<?= e(url('configuracion', ['tab' => 'reserva', 'accion' => 'viaje'])) ?>" id="viaje">
+    <?= campo_csrf() ?>
+    <h2>Tiempo de viaje con mapa</h2>
+    <p class="g-nota">Si llevas tus equipos a la casa del cliente, TuRenta calcula en el mapa cuánto se demora el viaje desde tu base hasta la
+        dirección de la fiesta. Así cada fiesta ocupa el equipo solo lo necesario: una fiesta cerca deja libre más tiempo que una lejos.
+        El cliente escribe su dirección antes de elegir la hora y solo ve las horas que alcanzan.</p>
+    <div class="casillas" style="margin-bottom:12px"><label><input type="checkbox" name="viaje_mapa" value="1" <?= !empty($n['viaje_mapa']) ? 'checked' : '' ?>> Calcular el tiempo de viaje con el mapa</label></div>
+    <?php if ($n['base_lat'] !== null && $n['base_lat'] !== ''): ?>
+        <p class="aviso aviso-ok">📍 Tu base está marcada en el mapa:
+            <a href="https://www.google.com/maps?q=<?= e((string) $n['base_lat']) ?>,<?= e((string) $n['base_lng']) ?>" target="_blank" rel="noopener">ver en Google Maps</a>.
+            Revisa que el punto sea el correcto.</p>
+    <?php endif; ?>
+    <div class="campo"><label for="base_direccion">Dirección de tu base <small>(de donde salen los equipos)</small></label>
+        <input type="text" id="base_direccion" name="base_direccion" maxlength="250" value="<?= $f('base_direccion') ?>" placeholder="2000 N Commerce Pkwy, Weston, FL 33326"></div>
+    <div class="fila-campos">
+        <div class="campo"><label for="base_lat">Latitud <small>(opcional)</small></label>
+            <input type="text" id="base_lat" name="base_lat" inputmode="decimal" value="" placeholder="<?= $n['base_lat'] !== null && $n['base_lat'] !== '' ? e((string) $n['base_lat']) : '26.100512' ?>"></div>
+        <div class="campo"><label for="base_lng">Longitud <small>(opcional)</small></label>
+            <input type="text" id="base_lng" name="base_lng" inputmode="decimal" value="" placeholder="<?= $n['base_lng'] !== null && $n['base_lng'] !== '' ? e((string) $n['base_lng']) : '-80.398811' ?>"></div>
+    </div>
+    <p class="g-nota">Déjalas vacías y TuRenta busca tu dirección en el mapa. Si el punto sale mal, en Google Maps haz clic derecho sobre tu base,
+        copia los dos números que aparecen arriba y pégalos aquí.</p>
+    <div class="fila-campos">
+        <div class="campo"><label for="viaje_extra_min">Margen de cada viaje (minutos)</label>
+            <input type="number" id="viaje_extra_min" name="viaje_extra_min" min="0" max="120" value="<?= (int) ($n['viaje_extra_min'] ?? 10) ?>">
+            <small>Se suma a la ida y a la vuelta: tráfico, gasolina, parqueo.</small></div>
+        <div class="campo"><label for="viaje_max_min">Viaje más largo en línea (minutos)</label>
+            <input type="number" id="viaje_max_min" name="viaje_max_min" min="5" max="600" value="<?= (int) ($n['viaje_max_min'] ?? 90) ?>">
+            <small>Más lejos que esto, la página le pide al cliente que te llame.</small></div>
+    </div>
+
+    <h3 style="margin-top:16px">Clave de Google Maps <small>(opcional, recomendada)</small></h3>
+    <p class="g-nota">Sin clave, TuRenta usa mapas gratuitos (calles reales, sin tráfico). Con la clave de Google usa el
+        <strong>tráfico típico de ese día</strong>, igual que las rutas de TuGuardería.</p>
+    <div class="g-ayuda">
+        <strong>¿Cómo saco la clave?</strong>
+        <ol>
+            <li>Entra a <strong>console.cloud.google.com</strong> con la cuenta de Google del negocio y crea un proyecto (ej. «TuRenta»).</li>
+            <li>En <strong>APIs y servicios → Biblioteca</strong>, busca y activa <strong>Routes API</strong> y <strong>Geocoding API</strong>.</li>
+            <li>En <strong>APIs y servicios → Credenciales → Crear credenciales → Clave de API</strong>. Copia la clave (empieza con <code>AIza</code>).</li>
+            <li>Recomendado: en la clave, <strong>Restricciones de API</strong> → deja solo Routes API y Geocoding API.</li>
+        </ol>
+        Google pide una tarjeta para el proyecto y regala un uso mensual; una reserva usa 2 consultas, y cada dirección se consulta una sola vez.
+    </div>
+    <div class="campo"><label for="google_maps_key">Clave de Google Maps</label>
+        <input type="password" id="google_maps_key" name="google_maps_key" value="" autocomplete="off" placeholder="<?= $conGoogle ? '•••••• (guardada; déjala vacía para no cambiarla)' : 'AIza…' ?>"></div>
+    <?php if ($conGoogle): ?>
+        <div class="casillas" style="margin-bottom:14px"><label><input type="checkbox" name="quitar_google" value="1"> Quitar la clave de Google (usar los mapas gratuitos)</label></div>
+    <?php endif; ?>
+    <button class="boton" type="submit">Guardar tiempo de viaje</button>
 </form>
 
 <?php elseif ($tab === 'pagina'):

@@ -2,6 +2,7 @@
 /**
  * Reserva en línea (inglés).
  * @var array $neg @var array $paquetes @var string $elegido @var string $fechaElegida @var string $primerDia @var array $df @var string $slug
+ * @var bool $usaMapa (201) las horas dependen de la dirección (viaje desde la base)
  */
 $v = fn(string $k, string $def = '') => e($df[$k] ?? $def);
 $pct = rtrim(rtrim(number_format((float) $neg['reserva_pct'], 2, '.', ''), '0'), '.');
@@ -21,7 +22,7 @@ $duracionTxt = function (int $min): string {
 <?php if (!$paquetes): ?>
     <p class="en-empty">Online booking will open soon. Please call us to book your party.</p>
 <?php else: ?>
-<form class="en-form" method="post" action="<?= e(url('reservar', ['s' => $slug])) ?>" data-reserva data-horas="<?= e(url('reservar', ['s' => $slug, 'json' => 'horas'])) ?>" novalidate>
+<form class="en-form" method="post" action="<?= e(url('reservar', ['s' => $slug])) ?>" data-reserva data-horas="<?= e(url('reservar', ['s' => $slug, 'json' => 'horas'])) ?>"<?= $usaMapa ? ' data-mapa="1"' : '' ?> novalidate>
     <?= campo_csrf() ?>
     <div class="en-trap" aria-hidden="true"><label for="sitio_web">Website</label><input id="sitio_web" name="sitio_web" tabindex="-1" autocomplete="off"></div>
 
@@ -44,7 +45,18 @@ $duracionTxt = function (int $min): string {
     </fieldset>
 
     <fieldset class="en-step">
-        <legend><span class="en-num">2</span> Date and time</legend>
+        <legend><span class="en-num">2</span> Where is the party?</legend>
+        <div class="en-grid">
+            <div class="en-field en-span"><label for="direccion">Party address</label>
+                <input id="direccion" name="direccion" maxlength="240" autocomplete="street-address" value="<?= $v('direccion') ?>" placeholder="1200 Main St, Weston, FL" required></div>
+            <div class="en-field"><label for="zip">ZIP code</label>
+                <input id="zip" name="zip" inputmode="numeric" maxlength="5" autocomplete="postal-code" value="<?= $v('zip') ?>" placeholder="33326" required></div>
+        </div>
+        <?php if ($usaMapa): ?><p class="en-small">We bring the party to you: open times include our drive to this address.</p><?php endif; ?>
+    </fieldset>
+
+    <fieldset class="en-step">
+        <legend><span class="en-num">3</span> Date and time</legend>
         <div class="en-field en-field-date">
             <label for="fecha">Party date</label>
             <input type="date" id="fecha" name="fecha" min="<?= e($primerDia) ?>" value="<?= e($fechaElegida) ?>" required>
@@ -58,7 +70,7 @@ $duracionTxt = function (int $min): string {
     </fieldset>
 
     <fieldset class="en-step">
-        <legend><span class="en-num">3</span> About the party</legend>
+        <legend><span class="en-num">4</span> About the party</legend>
         <div class="en-grid">
             <div class="en-field"><label for="ninos">How many kids?</label>
                 <input type="number" id="ninos" name="ninos" min="1" max="500" inputmode="numeric" value="<?= $v('ninos') ?>" placeholder="25" required></div>
@@ -66,17 +78,13 @@ $duracionTxt = function (int $min): string {
                 <select id="ocasion" name="ocasion"><?php foreach ($ocasiones as $k => $t): ?><option value="<?= e($k) ?>" <?= ($df['ocasion'] ?? 'cumpleanos') === $k ? 'selected' : '' ?>><?= e($t) ?></option><?php endforeach; ?></select></div>
             <div class="en-field en-span"><label for="homenajeado">Name of the birthday child or guest of honor <span class="en-opt">(optional)</span></label>
                 <input id="homenajeado" name="homenajeado" maxlength="80" value="<?= $v('homenajeado') ?>" placeholder="Sofia"></div>
-            <div class="en-field en-span"><label for="direccion">Party address</label>
-                <input id="direccion" name="direccion" maxlength="240" autocomplete="street-address" value="<?= $v('direccion') ?>" placeholder="1200 Main St, Weston, FL" required></div>
-            <div class="en-field"><label for="zip">ZIP code</label>
-                <input id="zip" name="zip" inputmode="numeric" maxlength="5" autocomplete="postal-code" value="<?= $v('zip') ?>" placeholder="33326" required></div>
             <div class="en-field en-span"><label for="notas">Anything we should know? <span class="en-opt">(optional)</span></label>
                 <textarea id="notas" name="notas" maxlength="1000" placeholder="Gate code, parking, add-ons you'd like…"><?= $v('notas') ?></textarea></div>
         </div>
     </fieldset>
 
     <fieldset class="en-step">
-        <legend><span class="en-num">4</span> Your contact</legend>
+        <legend><span class="en-num">5</span> Your contact</legend>
         <div class="en-grid">
             <div class="en-field en-span"><label for="nombre">Your name</label>
                 <input id="nombre" name="nombre" maxlength="150" autocomplete="name" value="<?= $v('nombre') ?>" required></div>

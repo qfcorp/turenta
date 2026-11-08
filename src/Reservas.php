@@ -24,7 +24,39 @@ final class Reservas
                               'corporativo' => 'Corporate or brand event'];
     public const MAX_POR_HORA = 5;
 
-    public function __construct(private PDO $db) {}
+    private Mapas $mapas;
+
+    public function __construct(private PDO $db, ?Mapas $mapas = null)
+    {
+        $this->mapas = $mapas ?? new Mapas($db);
+    }
+
+    /** ¿Las horas dependen de la dirección de la fiesta? (viaje con mapa encendido y base marcada) */
+    public function usaMapa(array $negocio): bool
+    {
+        return Mapas::activo($negocio);
+    }
+
+    /**
+     * (201) Viaje de UNA ida desde la base hasta la fiesta, con el margen del negocio:
+     * ['min' => minutos, 'lat' =>, 'lng' =>, 'metodo' =>, 'km' =>]. Sin mapa: min 0.
+     * Lanza RuntimeException (en inglés, lo ve el cliente) si la dirección no se encuentra o queda muy lejos.
+     */
+    public function viaje(array $negocio, string $direccion, string $zip, ?string $fecha = null): array
+    {
+        if (!$this->usaMapa($negocio)) return ['min' => 0, 'lat' => null, 'lng' => null, 'metodo' => null, 'km' => null];
+        $tel = trim((string) ($negocio['telefono'] ?: ($negocio['whatsapp'] ?? '')));
+        $llamar = $tel !== '' ? " Please call or text us at $tel." : ' Please call or text us.';
+        if (mb_strlen(trim($direccion)) < 6) throw new RuntimeException('Please write the party address to see open times.');
+        $p = $this->mapas->punto($negocio, $direccion, $zip);
+        if (!$p) throw new RuntimeException('We could not find that address on the map. Please check the street, city and ZIP code.' . $llamar);
+        $v = $this->mapas->viaje($negocio, $p['lat'], $p['lng'], $fecha);
+        $min = (int) ($v['min'] ?? 0) + max(0, (int) $negocio['viaje_extra_min']);
+        if ($min > (int) $negocio['viaje_max_min']) {
+            throw new RuntimeException("That address is outside our online booking area (about $min minutes away)." . $llamar);
+        }
+        return ['min' => $min, 'lat' => $p['lat'], 'lng' => $p['lng'], 'metodo' => $v['metodo'] ?? null, 'km' => $v['km'] ?? null];
+    }
 
     public function negocio(string $slug): ?array
     {
@@ -74,7 +106,7 @@ final class Reservas
     /**
      * Horas de inicio libres de un paquete en una fecha: [['hora' => '15:00', 'texto' => '3:00 PM', 'espacio_id' => 3], ...]
      */
-    public function horarios(array $negocio, array $paquete, string $fecha, ?DateTimeImmutable $hoy = null): array
+    public function horarios(array $negocio, array $paquete, string $fecha, ?DateTimeImmutable $hoy = null, int $viajeMin = 0): array
     {
         if (!Ventas::fechaValida($fecha)) return [];
         $hoy ??= new DateTimeImmutable('today');
@@ -88,18 +120,18 @@ final class Reservas
         for ($t = $desde; $t <= $hasta; $t = $t->modify("+$paso minutes")) {
             $hi = $t->format('H:i');
             $hf = $t->modify("+$dur minutes")->format('H:i');
-            $espacio = $this->equipoLibre($eventos, (int) $negocio['id'], $paquete['espacios'], $fecha, $hi, $hf, null, $hoy);
+            $espacio = $this->equipoLibre($eventos, (int) $negocio['id'], $paquete['espacios'], $fecha, $hi, $hf, null, $hoy, $viajeMin);
             if ($espacio !== null) $libres[] = ['hora' => $hi, 'texto' => $t->format('g:i A'), 'espacio_id' => $espacio];
         }
         return $libres;
     }
 
     /** Primer equipo de la lista sin otro evento separado o retenido a esa hora (ni día cerrado). */
-    private function equipoLibre(Eventos $eventos, int $negocioId, array $espacios, string $fecha, string $hi, string $hf, ?int $excluir, DateTimeImmutable $hoy): ?int
+    private function equipoLibre(Eventos $eventos, int $negocioId, array $espacios, string $fecha, string $hi, string $hf, ?int $excluir, DateTimeImmutable $hoy, int $viajeMin = 0): ?int
     {
         foreach ($espacios as $id) {
             $ocupado = false;
-            foreach ($eventos->choques($negocioId, $fecha, $hi, $hf, [$id], $excluir, $hoy) as $c) {
+            foreach ($eventos->choques($negocioId, $fecha, $hi, $hf, [$id], $excluir, $hoy, $viajeMin) as $c) {
                 if (in_array($c['nivel'], ['bloqueado', 'retenido'], true)) {
                     $ocupado = true;
                     break;
@@ -158,7 +190,8 @@ final class Reservas
         $homenajeado = mb_substr(trim((string) ($d['homenajeado'] ?? '')), 0, 80);
         $notas = mb_substr(trim((string) ($d['notas'] ?? '')), 0, 1000);
 
-        $libres = $this->horarios($negocio, $paq, $fecha, $hoy);
+        $viaje = $this->viaje($negocio, $direccion, $zip, $fecha);
+        $libres = $this->horarios($negocio, $paq, $fecha, $hoy, $viaje['min']);
         $espacioId = null;
         foreach ($libres as $l) {
             if ($l['hora'] === $hora) $espacioId = $l['espacio_id'];
@@ -187,10 +220,17 @@ final class Reservas
             $evId = $eventos->crear($nid, [
                 'cliente_id' => $clienteId, 'tipo' => $ocasion, 'fecha' => $fecha, 'hora_inicio' => $hora, 'hora_fin' => $fin,
                 'invitados' => $ninos, 'espacios' => [$espacioId], 'origen' => 'pagina', 'notas' => $texto,
-                'nombre' => mb_substr($titulo, 0, 150),
+                'nombre' => mb_substr($titulo, 0, 150), 'viaje_min' => $viaje['min'],
             ], null, $hoy);
-            $this->db->prepare("UPDATE eventos SET origen = 'pagina', reserva_paquete_id = ?, direccion = ?, codigo_postal = ?, detalles_cliente = ? WHERE id = ?")
-                     ->execute([$paq['id'], mb_substr($direccion, 0, 250), $zip, $notas ?: null, $evId]);
+            $this->db->prepare("UPDATE eventos SET origen = 'pagina', reserva_paquete_id = ?, direccion = ?, codigo_postal = ?, detalles_cliente = ?,
+                                       viaje_metodo = ?, lat = ?, lng = ? WHERE id = ?")
+                     ->execute([$paq['id'], mb_substr($direccion, 0, 250), $zip, $notas ?: null,
+                                $viaje['metodo'] ? mb_substr((string) $viaje['metodo'], 0, 40) : null, $viaje['lat'], $viaje['lng'], $evId]);
+            if ($viaje['metodo']) {
+                $this->db->prepare("INSERT INTO registro_cambios (negocio_id, evento_id, quien, accion) VALUES (?,?, 'Sistema', ?)")
+                         ->execute([$nid, $evId, 'Viaje desde la base: ' . $viaje['min'] . ' min de ida con el margen (' . $viaje['metodo']
+                                    . ($viaje['km'] ? ', ' . number_format((float) $viaje['km'], 1, ',', '.') . ' km' : '') . ')']);
+            }
             $cot = new Cotizaciones($this->db);
             $cotId = $cot->crear($nid, $evId, (int) $paq['id'], null, $hoy);
             $cot->aceptar($nid, $cotId, $nombre, $ip, null, $hoy);
@@ -236,7 +276,8 @@ final class Reservas
         $hf = substr((string) $ev['hora_fin'], 0, 5);
         $hoy ??= new DateTimeImmutable('today');
         $nid = (int) $ev['negocio_id'];
-        $bloqueado = fn(array $ids) => (bool) array_filter($eventos->choques($nid, $ev['fecha'], $hi, $hf, $ids, $eventoId, $hoy),
+        $viaje = $eventos->viajeDe($eventoId);
+        $bloqueado = fn(array $ids) => (bool) array_filter($eventos->choques($nid, $ev['fecha'], $hi, $hf, $ids, $eventoId, $hoy, $viaje),
                                                             fn($c) => $c['nivel'] === 'bloqueado');
         if ($actuales && !$bloqueado($actuales)) return true;
         $st = $this->db->prepare('SELECT pe.espacio_id FROM paquete_espacios pe JOIN espacios es ON es.id = pe.espacio_id
@@ -244,7 +285,7 @@ final class Reservas
         $st->execute([$ev['reserva_paquete_id']]);
         foreach (array_map('intval', $st->fetchAll(PDO::FETCH_COLUMN)) as $id) {
             if (in_array($id, $actuales, true) || $bloqueado([$id])) continue;
-            [$desde, $hasta] = $eventos->periodo($nid, $ev['fecha'], $hi, $hf);
+            [$desde, $hasta] = $eventos->periodo($nid, $ev['fecha'], $hi, $hf, $eventos->viajeDe($eventoId), $id);
             $this->db->prepare('DELETE FROM evento_espacios WHERE evento_id = ?')->execute([$eventoId]);
             $this->db->prepare('INSERT INTO evento_espacios (negocio_id, evento_id, espacio_id, periodo, bloquea) VALUES (?,?,?, tsrange(?::timestamp, ?::timestamp), false)')
                      ->execute([$nid, $eventoId, $id, $desde, $hasta]);

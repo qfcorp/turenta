@@ -2,6 +2,20 @@
 
 Última actualización: 6 de noviembre de 2026
 
+## 7 nov 2026 — Tiempo de viaje con mapa y montaje por equipo (decisión de Dimitry)
+- Pedido: calcular el viaje hasta la fiesta con Google Maps, como las rutas de recogida de **TuGuardería**, y que cada equipo tenga su
+  propio tiempo de montaje y desmontaje (un camión grande se demora más que uno chico).
+- Hecho (migración 201, `src/Mapas.php`): mismo orden que TuGuardería — Google (Routes API con tráfico típico del día + Geocoding API) si el
+  negocio pone su clave; gratis con OSRM (calles reales), el geocodificador del Censo de EE.UU. y OpenStreetMap; último recurso aproximado.
+  Cada dirección y cada viaje se guardan en `mapa_cache` (se pagan una sola vez).
+- El equipo queda ocupado desde «inicio − viaje − montaje del equipo» hasta «fin + desmontaje del equipo + viaje». Viaje = una ida + margen
+  del negocio. El viaje se guarda en el evento (`eventos.viaje_min`) y no se pierde al editarlo en el panel.
+- Reserva en línea: la dirección pasa al paso 2 (antes de la hora); más lejos que el máximo → «llámenos».
+- Configuración → Reserva en línea → **Tiempo de viaje con mapa** (base, clave de Google, margen, máximo). Espacios → **Montaje / Desmontaje**
+  (minutos; vacío = Reglas). Cambiar los minutos de un equipo recalcula sus eventos y no deja cruzar dos separados.
+- Pruebas: `tests/logica_201_viaje_mapas.php` (47) y `tests/web_201_viaje.sh` (29). Mapas simulados.
+- Pendiente: viaje de una fiesta a la siguiente sin pasar por la base; poner la clave de Google de Zombie Ice y los minutos de cada camión.
+
 ## 7 nov 2026 — Nace TuRenta (copia de TuEvento) para Zombie Ice (decisión de Dimitry)
 - Pedido: un programa Tukán que maneje la página de Zombie Ice, con reservas, cobro por **Stripe** y que el cliente vea cómo va su reserva.
 - Base: **TuEvento** (TuPlanner no aporta para alquiler de fiestas). Nombre provisional **TuRenta**, repo `qfcorp/turenta`, dirección `turenta.tukanec.com`, servidor de Tukán.

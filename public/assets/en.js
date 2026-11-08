@@ -24,6 +24,12 @@
     var hora = form.querySelector('[data-hora]');
     var urlHoras = form.getAttribute('data-horas');
     var ninos = form.querySelector('#ninos');
+    // (201) Con viaje por mapa las horas dependen de la dirección de la fiesta
+    var conMapa = form.getAttribute('data-mapa') === '1';
+    var direccion = form.querySelector('#direccion');
+    var zip = form.querySelector('#zip');
+    var lugar = function () { return conMapa ? (direccion.value.trim() + '|' + zip.value.trim()) : ''; };
+    var ultimoLugar = lugar();
     var dinero = function (v) { return '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
     var paquete = function () { return form.querySelector('input[name="paquete"]:checked'); };
     var pedido = 0;
@@ -61,16 +67,24 @@
 
     function cargarHoras() {
       var p = paquete();
+      if (conMapa && (direccion.value.trim().length < 6 || !/^\d{5}$/.test(zip.value.trim()))) {
+        hora.value = '';
+        texto('Write the party address and ZIP code above to see open times.');
+        resumen();
+        return;
+      }
       if (!p || !fecha.value) { texto('Pick a date to see open times.'); resumen(); return; }
       var id = ++pedido;
       texto('Checking open times…');
-      fetch(urlHoras + '&p=' + encodeURIComponent(p.value) + '&fecha=' + encodeURIComponent(fecha.value), { headers: { 'Accept': 'application/json' } })
+      var url = urlHoras + '&p=' + encodeURIComponent(p.value) + '&fecha=' + encodeURIComponent(fecha.value);
+      if (conMapa) url += '&direccion=' + encodeURIComponent(direccion.value.trim()) + '&zip=' + encodeURIComponent(zip.value.trim());
+      fetch(url, { headers: { 'Accept': 'application/json' } })
         .then(function (r) { return r.json(); })
         .then(function (d) {
           if (id !== pedido) return;
           if (!d.horas || !d.horas.length) {
             hora.value = '';
-            texto('No open times that day for this party. Please try another date.');
+            texto(d.mensaje || 'No open times that day for this party. Please try another date.');
             resumen();
             return;
           }
@@ -105,6 +119,11 @@
 
     form.addEventListener('change', function (ev) {
       if (ev.target.name === 'paquete' || ev.target === fecha) cargarHoras();
+      // La dirección cambió (al salir del campo): las horas se vuelven a calcular con el viaje nuevo
+      if (conMapa && (ev.target === direccion || ev.target === zip) && lugar() !== ultimoLugar) {
+        ultimoLugar = lugar();
+        cargarHoras();
+      }
     });
     form.addEventListener('submit', function (ev) {
       if (!hora.value) {

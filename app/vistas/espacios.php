@@ -1,5 +1,7 @@
 <?php
-/** @var array $espacios @var ?array $form @var array $cerradas @var ?int $max @var bool $puedeAgregar @var bool $puedeEditar */
+/** @var array $espacios @var ?array $form @var array $cerradas @var ?int $max @var bool $puedeAgregar @var bool $puedeEditar
+ *  @var array $montajeNegocio [montaje, desmontaje] en minutos de Reglas (201: lo que usa un equipo sin minutos propios) */
+$minTxt = fn(int $m) => $m % 60 === 0 ? ($m / 60) . ' h' : ($m >= 60 ? intdiv($m, 60) . ' h ' . ($m % 60) . ' min' : "$m min");
 $colores = ['#6B2D3C' => 'Vino', '#3E7C59' => 'Verde', '#22457A' => 'Azul', '#B8862B' => 'Dorado', '#7A3E8C' => 'Morado', '#B53D33' => 'Rojo', '#2E7C80' => 'Turquesa', '#5B5054' => 'Gris'];
 $activosLista = array_filter($espacios, fn($e) => $e['activo']);
 ?>
@@ -70,6 +72,18 @@ $activosLista = array_filter($espacios, fn($e) => $e['activo']);
                 </div>
             </fieldset>
             <div class="campo">
+                <label for="montaje_min">Montaje <small>(minutos, opcional)</small></label>
+                <input type="number" id="montaje_min" name="montaje_min" min="0" max="1440" step="5" value="<?= e((string) ($form['montaje_min'] ?? '')) ?>"
+                       placeholder="<?= e((string) $montajeNegocio[0]) ?>">
+            </div>
+            <div class="campo">
+                <label for="desmontaje_min">Desmontaje <small>(minutos, opcional)</small></label>
+                <input type="number" id="desmontaje_min" name="desmontaje_min" min="0" max="1440" step="5" value="<?= e((string) ($form['desmontaje_min'] ?? '')) ?>"
+                       placeholder="<?= e((string) $montajeNegocio[1]) ?>">
+            </div>
+            <p class="ayuda-chica ancho">Cuánto se demora ESTE equipo en armarse antes y en recogerse después (ej. un camión grande 45 min, uno chico 15 min).
+                Vacío = lo de Reglas (<?= e($minTxt($montajeNegocio[0])) ?> antes y <?= e($minTxt($montajeNegocio[1])) ?> después). El viaje se suma aparte si usas el tiempo de viaje con mapa.</p>
+            <div class="campo">
                 <label for="orden">Orden <small>(1 = primero)</small></label>
                 <input type="number" id="orden" name="orden" min="0" max="999" value="<?= e((string) $form['orden']) ?>">
             </div>
@@ -114,6 +128,10 @@ $activosLista = array_filter($espacios, fn($e) => $e['activo']);
                 <h3><?= e($es['nombre']) ?> <?= !$es['activo'] ? '<span class="etq etq-reservada">Desactivado</span>' : '' ?></h3>
                 <p class="suave"><?= $es['capacidad_banquete'] ? (int) $es['capacidad_banquete'] . ' sentados' : 'Sin capacidad escrita' ?><?= $es['capacidad_coctel'] ? ' · ' . (int) $es['capacidad_coctel'] . ' de pie' : '' ?>
                     <?= (float) $es['precio_base'] > 0 ? ' · ' . dinero($es['precio_base']) : '' ?></p>
+                <?php if ($es['montaje_min'] !== null || $es['desmontaje_min'] !== null): ?>
+                    <p class="suave ayuda-chica">Montaje <?= e($minTxt($es['montaje_min'] !== null ? (int) $es['montaje_min'] : $montajeNegocio[0])) ?>
+                        · desmontaje <?= e($minTxt($es['desmontaje_min'] !== null ? (int) $es['desmontaje_min'] : $montajeNegocio[1])) ?></p>
+                <?php endif; ?>
                 <?php if ($es['descripcion']): ?><p class="esp-desc"><?= e($es['descripcion']) ?></p><?php endif; ?>
                 <p class="suave ayuda-chica"><?= (int) $es['eventos_futuros'] ?> <?= (int) $es['eventos_futuros'] === 1 ? 'evento próximo' : 'eventos próximos' ?></p>
                 <?php if ($es['activo'] && modulo_activo($u, 'plano')): ?><p class="ayuda-chica"><a href="<?= e(url('plano', ['espacio' => $es['id']])) ?>#esp-<?= (int) $es['id'] ?>">Plano y distribuciones</a></p><?php endif; ?>

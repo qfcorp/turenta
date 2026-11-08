@@ -19,6 +19,9 @@ nacida el 7 nov 2026 para el cliente **Zombie Ice** (Florida). Además de todo l
   equipo mientras pagaba, pasa a otro equipo libre del mismo paquete. Modo prueba con claves `sk_test_`.
 - **Portal «My Party» en inglés** (cuando el negocio tiene `idioma_publico = en`): estado, cuenta regresiva, pasos, pagos y botón para pagar el saldo.
 - Panel: **Configuración → Reserva en línea y Stripe** (horas, aviso mínimo, condiciones, claves) y en **Paquetes** la sección «Reserva en línea».
+- **Tiempo de viaje con mapa** (migración 201, como las rutas de TuGuardería): Google Maps con tráfico si el negocio pone su clave, si no
+  mapas gratuitos. Cada fiesta ocupa el equipo con el viaje desde la base hasta su dirección; el cliente pone la dirección antes de la hora.
+  Cada equipo tiene sus **minutos de montaje y desmontaje** (Espacios).
 - Zona horaria configurable (`TURENTA_ZONA`, el instalador pone `America/New_York`).
 - Datos de Zombie Ice: `php bin/cargar_zombieice.php [correo]` (6 fiestas, extras, equipos y reserva en línea).
 

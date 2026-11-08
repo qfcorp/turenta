@@ -151,30 +151,60 @@ final class Eventos
      * Si la hora de fin es menor o igual que la de inicio, el evento termina al día siguiente.
      * @return array{0:string,1:string} 'Y-m-d H:i:s'
      */
-    public function periodo(int $negocioId, string $fecha, string $horaInicio, string $horaFin): array
+    public function periodo(int $negocioId, string $fecha, string $horaInicio, string $horaFin, int $viajeMin = 0, ?int $espacioId = null): array
     {
-        $st = $this->db->prepare('SELECT horas_montaje, horas_desmontaje FROM negocios WHERE id = ?');
-        $st->execute([$negocioId]);
-        $n = $st->fetch() ?: ['horas_montaje' => 0, 'horas_desmontaje' => 0];
+        [$montaje, $desmontaje] = $this->minutosMontaje($negocioId, $espacioId);
+        $viajeMin = max(0, $viajeMin);
         $ini = new DateTimeImmutable("$fecha " . substr($horaInicio, 0, 5));
         $fin = new DateTimeImmutable("$fecha " . substr($horaFin, 0, 5));
         if ($fin <= $ini) $fin = $fin->modify('+1 day');
-        $ini = $ini->modify('-' . (int) round((float) $n['horas_montaje'] * 60) . ' minutes');
-        $fin = $fin->modify('+' . (int) round((float) $n['horas_desmontaje'] * 60) . ' minutes');
+        // (201) El equipo sale de la base: viaje de ida + montaje antes; desmontaje + viaje de vuelta después
+        $ini = $ini->modify('-' . ($montaje + $viajeMin) . ' minutes');
+        $fin = $fin->modify('+' . ($desmontaje + $viajeMin) . ' minutes');
         return [$ini->format('Y-m-d H:i:s'), $fin->format('Y-m-d H:i:s')];
+    }
+
+    /**
+     * Minutos de montaje y desmontaje (201): los del equipo si los tiene (un camión grande tarda más que uno chico);
+     * si no, las horas de montaje y desmontaje del negocio (Reglas).
+     * @return array{0:int,1:int}
+     */
+    public function minutosMontaje(int $negocioId, ?int $espacioId = null): array
+    {
+        $st = $this->db->prepare('SELECT n.horas_montaje, n.horas_desmontaje, es.montaje_min, es.desmontaje_min
+                                    FROM negocios n LEFT JOIN espacios es ON es.id = ?::int AND es.negocio_id = n.id WHERE n.id = ?');
+        $st->execute([$espacioId, $negocioId]);
+        $r = $st->fetch() ?: ['horas_montaje' => 0, 'horas_desmontaje' => 0, 'montaje_min' => null, 'desmontaje_min' => null];
+        $montaje = $r['montaje_min'] !== null ? (int) $r['montaje_min'] : (int) round((float) $r['horas_montaje'] * 60);
+        $desmontaje = $r['desmontaje_min'] !== null ? (int) $r['desmontaje_min'] : (int) round((float) $r['horas_desmontaje'] * 60);
+        return [$montaje, $desmontaje];
     }
 
     /**
      * Eventos que chocan con ese horario en esos espacios.
      * Cada choque trae 'nivel': 'bloqueado' (separado/confirmado/realizado), 'retenido' (cotizado vigente) o 'consulta'.
      */
-    public function choques(int $negocioId, string $fecha, string $horaInicio, string $horaFin, array $espacioIds, ?int $excluirEvento = null, ?DateTimeImmutable $hoy = null): array
+    public function choques(int $negocioId, string $fecha, string $horaInicio, string $horaFin, array $espacioIds, ?int $excluirEvento = null, ?DateTimeImmutable $hoy = null, int $viajeMin = 0): array
     {
         $espacioIds = array_values(array_filter(array_map('intval', $espacioIds)));
         if (!$espacioIds) return [];
-        [$desde, $hasta] = $this->periodo($negocioId, $fecha, $horaInicio, $horaFin);
         $hoyTxt = ($hoy ?? new DateTimeImmutable('today'))->format('Y-m-d');
         $marcas = implode(',', array_fill(0, count($espacioIds), '?'));
+        // (201) Cada equipo tiene su propio montaje y desmontaje: el horario ocupado se arma equipo por equipo
+        $choques = [];
+        foreach ($espacioIds as $espacioId) {
+            [$desde, $hasta] = $this->periodo($negocioId, $fecha, $horaInicio, $horaFin, $viajeMin, $espacioId);
+            array_push($choques, ...$this->choquesEnEquipo($negocioId, $espacioId, $desde, $hasta, $excluirEvento, $hoyTxt));
+        }
+        usort($choques, fn($a, $b) => (($b['nivel'] === 'bloqueado') <=> ($a['nivel'] === 'bloqueado')) ?: strcmp((string) $a['fecha'], (string) $b['fecha']));
+        return $this->conDiasCerrados($choques, $negocioId, $fecha, $espacioIds, $marcas);
+    }
+
+    /** Eventos que ocupan ese equipo en ese horario (ya con montaje, desmontaje y viaje). */
+    private function choquesEnEquipo(int $negocioId, int $espacioId, string $desde, string $hasta, ?int $excluirEvento, string $hoyTxt): array
+    {
+        $espacioIds = [$espacioId];
+        $marcas = '?';
         $st = $this->db->prepare(
             "SELECT e.id, e.codigo, e.nombre, e.estado, e.fecha, e.hora_inicio, e.hora_fin, e.retenida_hasta,
                     es.id AS espacio_id, es.nombre AS espacio, c.nombre AS cliente,
@@ -192,8 +222,12 @@ final class Eventos
            ORDER BY ee.bloquea DESC, e.fecha"
         );
         $st->execute([$hoyTxt, $negocioId, ...$espacioIds, $desde, $hasta, $excluirEvento, $excluirEvento]);
-        $choques = $st->fetchAll();
-        // Días cerrados
+        return $st->fetchAll();
+    }
+
+    /** Agrega los días cerrados (de todo el negocio o de esos equipos) a la lista de choques. */
+    private function conDiasCerrados(array $choques, int $negocioId, string $fecha, array $espacioIds, string $marcas): array
+    {
         $st = $this->db->prepare("SELECT fc.fecha, fc.motivo, fc.espacio_id, es.nombre AS espacio FROM fechas_cerradas fc
                                    LEFT JOIN espacios es ON es.id = fc.espacio_id
                                    WHERE fc.negocio_id = ? AND fc.fecha = ?::date AND (fc.espacio_id IS NULL OR fc.espacio_id IN ($marcas))");
@@ -322,6 +356,9 @@ final class Eventos
                           $v['invitados'], $v['vendedor_id'] ?? $usuarioId, $v['origen'] ?? $cli['origen'], $v['montaje'],
                           $v['presupuesto_cliente'], $v['notas'], $usuarioId]);
             $id = (int) $st->fetchColumn();
+            if (isset($d['viaje_min'])) {   // (201) reserva en línea: minutos de viaje desde la base, antes de ocupar el equipo
+                $this->db->prepare('UPDATE eventos SET viaje_min = ? WHERE id = ?')->execute([max(0, min(1440, (int) $d['viaje_min'])), $id]);
+            }
             $this->guardarEspacios($negocioId, $id, $v['fecha'], $v['hora_inicio'], $v['hora_fin'], $v['espacios'], false);
             $this->crearTareasDesdePlantilla($negocioId, $id, $v['tipo'], $v['fecha']);
             $st = $this->db->prepare('SELECT garantia_defecto FROM negocios WHERE id = ?');
@@ -375,24 +412,33 @@ final class Eventos
     /** Guarda los espacios del evento con su horario. Traduce el choque de la base de datos a un mensaje claro. */
     private function guardarEspacios(int $negocioId, int $eventoId, string $fecha, string $hi, string $hf, array $espacios, bool $bloquea): void
     {
-        [$desde, $hasta] = $this->periodo($negocioId, $fecha, $hi, $hf);
+        $viaje = $this->viajeDe($eventoId);
         if ($bloquea) $this->exigirLibre($negocioId, $fecha, $hi, $hf, $espacios, $eventoId);
         $marcas = implode(',', array_fill(0, count($espacios), '?'));
         $this->db->prepare("DELETE FROM evento_espacios WHERE evento_id = ? AND espacio_id NOT IN ($marcas)")->execute([$eventoId, ...$espacios]);
         $st = $this->db->prepare('INSERT INTO evento_espacios (negocio_id, evento_id, espacio_id, periodo, bloquea)
                                   VALUES (?,?,?, tsrange(?::timestamp, ?::timestamp), ?)
                                   ON CONFLICT (evento_id, espacio_id) DO UPDATE SET periodo = EXCLUDED.periodo, bloquea = EXCLUDED.bloquea');
-        $this->conTraduccionDeChoque(function () use ($st, $negocioId, $eventoId, $espacios, $desde, $hasta, $bloquea) {
+        $this->conTraduccionDeChoque(function () use ($st, $negocioId, $eventoId, $espacios, $fecha, $hi, $hf, $viaje, $bloquea) {
             foreach ($espacios as $esp) {
+                [$desde, $hasta] = $this->periodo($negocioId, $fecha, $hi, $hf, $viaje, (int) $esp);
                 $st->execute([$negocioId, $eventoId, $esp, $desde, $hasta, $bloquea ? 'true' : 'false']);
             }
         });
     }
 
+    /** Minutos de viaje (una ida) guardados en el evento (201). 0 si no tiene. */
+    public function viajeDe(int $eventoId): int
+    {
+        $st = $this->db->prepare('SELECT viaje_min FROM eventos WHERE id = ?');
+        $st->execute([$eventoId]);
+        return max(0, (int) $st->fetchColumn());
+    }
+
     /** Lanza un error con el evento que ya tiene separada la fecha. */
     private function exigirLibre(int $negocioId, string $fecha, string $hi, string $hf, array $espacios, int $eventoId): void
     {
-        foreach ($this->choques($negocioId, $fecha, $hi, $hf, $espacios, $eventoId) as $c) {
+        foreach ($this->choques($negocioId, $fecha, $hi, $hf, $espacios, $eventoId, null, $this->viajeDe($eventoId)) as $c) {
             if ($c['nivel'] === 'bloqueado') {
                 throw new RuntimeException($c['estado'] === 'cerrado'
                     ? "Esa fecha está cerrada en {$c['espacio']} ({$c['nombre']})."

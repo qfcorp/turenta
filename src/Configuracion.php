@@ -215,6 +215,53 @@ final class Configuracion
                             $sk ?: null, $pk ?: null, $wh ?: null, $negocioId]);
     }
 
+    /**
+     * (201) Tiempo de viaje con mapa: punto de salida (base), clave de Google (opcional), margen y distancia máxima.
+     * Si escribe latitud y longitud se usan tal cual; si no, se busca la dirección de la base en el mapa.
+     * $mapas se pasa en las pruebas (sin internet).
+     */
+    public function guardarViaje(int $negocioId, array $d, ?Mapas $mapas = null): void
+    {
+        $n = $this->negocio($negocioId);
+        $activo = !empty($d['viaje_mapa']);
+        $dir = self::texto($d, 'base_direccion', 250);
+        $extra = (int) ($d['viaje_extra_min'] ?? 10);
+        if ($extra < 0 || $extra > 120) throw new RuntimeException('El margen de cada viaje debe ser de 0 a 120 minutos.');
+        $max = (int) ($d['viaje_max_min'] ?? 90);
+        if ($max < 5 || $max > 600) throw new RuntimeException('El viaje más largo que aceptas en línea debe ser de 5 a 600 minutos.');
+        $key = trim((string) ($d['google_maps_key'] ?? ''));
+        if (!empty($d['quitar_google'])) {
+            $key = '';
+        } elseif ($key === '') {
+            $key = (string) ($n['google_maps_key'] ?? '');   // vacío = se queda la guardada
+        } elseif (!Mapas::claveValida($key)) {
+            throw new RuntimeException('La clave de Google Maps no parece completa. Cópiala otra vez desde Google Cloud (empieza con AIza…).');
+        }
+        $coord = function (string $k, float $limite) use ($d): ?float {
+            $v = str_replace(',', '.', trim((string) ($d[$k] ?? '')));
+            if ($v === '') return null;
+            if (!is_numeric($v) || abs((float) $v) > $limite) throw new RuntimeException('Revisa la latitud y la longitud de tu base (ej. 26.100512 y -80.398811).');
+            return round((float) $v, 6);
+        };
+        $lat = $coord('base_lat', 90);
+        $lng = $coord('base_lng', 180);
+        if (($lat === null) !== ($lng === null)) throw new RuntimeException('Escribe las dos: latitud y longitud de tu base (o déjalas vacías para buscar la dirección).');
+        if ($lat === null && $dir !== null) {
+            // La dirección cambió o no tiene punto: se busca en el mapa
+            if ($dir !== ($n['base_direccion'] ?? null) || $n['base_lat'] === null) {
+                $p = ($mapas ?? new Mapas($this->db))->punto(['google_maps_key' => $key] + $n, $dir);
+                if (!$p) throw new RuntimeException('No encontramos la dirección de tu base en el mapa. Escríbela completa (calle, ciudad, estado y código postal) o pon la latitud y longitud.');
+                [$lat, $lng] = [$p['lat'], $p['lng']];
+            } else {
+                [$lat, $lng] = [(float) $n['base_lat'], (float) $n['base_lng']];
+            }
+        }
+        if ($activo && $lat === null) throw new RuntimeException('Para calcular el viaje necesitamos de dónde salen tus equipos: escribe la dirección de tu base.');
+        $this->db->prepare('UPDATE negocios SET viaje_mapa = ?, base_direccion = ?, base_lat = ?, base_lng = ?, google_maps_key = ?,
+                                   viaje_extra_min = ?, viaje_max_min = ? WHERE id = ?')
+                 ->execute([$activo ? 'true' : 'false', $dir, $lat, $lng, $key ?: null, $extra, $max, $negocioId]);
+    }
+
     public function guardarTransmision(int $negocioId, string $whatsapp): void
     {
         $n = WhatsApp::normalizarTelefono($whatsapp);

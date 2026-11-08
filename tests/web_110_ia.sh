@@ -93,7 +93,7 @@ contiene "Eventos: botón «Desde un mensaje»" "$TMP/pag.html" "r=ia_cotizacion
 check "La pantalla abre" "200" "$(get "r=ia_cotizacion")"
 contiene "…con el cuadro del mensaje" "$TMP/pag.html" "Mensaje del cliente"
 get "r=planes" > /dev/null
-contiene "Mi plan: el Asistente IA que ya paga dice «Extra · \$5» (migración 112)" "$TMP/pag.html" "Extra · \$5,00 al mes"
+contiene "Mi plan: el Asistente IA que ya paga dice «Extra · \$5» (migración 112)" "$TMP/pag.html" "Extra · \$5,00 + IVA al mes"
 ESP=$(sql "SELECT id FROM espacios WHERE negocio_id=$NID AND activo ORDER BY orden LIMIT 1")
 P1=$(sql "SELECT id FROM productos WHERE negocio_id=$NID AND activo AND unidad <> 'persona' ORDER BY id LIMIT 1")
 ANIO=$(( $(date +%Y) + 1 ))

@@ -209,3 +209,10 @@ Regla de Dimi: "todos los programas deben ser modulares para encender o apagar l
 7. [ ] WhatsApp automático (API oficial, pagada); hoy hay WhatsApp con un toque
 8. [ ] Agregar TuRenta a tukansoftware.com
 9. [ ] Manual en PDF y presentación de ventas (como TuSalón)
+
+## 7 nov 2026 — Legal (auditoría de 20 puntos)
+- **Cancelar mi plan** (módulo común `TukanCancelarPlan.php`, copia igual a la de tukan-central/herramientas/cancelar_plan): sección al final de Mi plan con casilla de confirmar y motivo; no borra nada, sigue hasta el último día pagado; guarda en `tukan_cancelaciones` y avisa al Panel (`plux_api.php` acción `cancelar_plan`), que cancela las suscripciones Plux, lo muestra en Inicio y avisa por Telegram. «Seguir con mi plan» lo deshace. En la app de Google Play solo explica cómo cancelar en Google Play.
+- **Aceptar términos y privacidad** (módulo común `TukanLegal.php`): aviso arriba para el dueño/administrador hasta que acepte (casilla + Aceptar, se guarda en `tukan_aceptaciones` con versión `2026-10-27` de tukansoftware.com/terminos.html); enlaces **Términos · Privacidad** en el menú y en la pantalla de entrar.
+- **+ IVA**: Mi plan y el mensaje de renovación muestran los precios del software con «+ IVA».
+- Manual: capítulo nuevo «Términos, privacidad y cancelar tu plan» y PDF regenerado (`SOLO_PDF=1`).
+- Pruebas nuevas en las pruebas de pantallas (cancelar, seguir, aceptar términos, casilla de reserva).

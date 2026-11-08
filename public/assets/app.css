@@ -580,3 +580,16 @@ body.admin { background: var(--fondo); }
 .lista-mas { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
 .lista-mas a { background: var(--superficie); border: 1px solid var(--linea); border-radius: var(--radio); padding: 14px; text-decoration: none; color: var(--tinta); font-weight: 600; box-shadow: var(--sombra); }
 .lista-mas a small { display: block; font-weight: 400; color: var(--tinta-suave); margin-top: 2px; }
+
+/* «Cancelar mi plan» (módulo común TukanCancelarPlan.php, 7 nov 2026) */
+.tukan-cancelar details summary{cursor:pointer;font-weight:600}
+.tukan-cancelar label{display:block;margin:10px 0}
+.tukan-cancelar textarea{width:100%;box-sizing:border-box}
+.tukan-cancelar .tc-confirmo{display:flex;gap:8px;align-items:flex-start}
+.tukan-cancelar .boton-peligro{background:#b42318;border-color:#b42318;color:#fff}
+/* Aviso de términos y enlaces legales (módulo común TukanLegal.php, 7 nov 2026) */
+.tukan-legal-aviso{background:#fff8e1;border:1px solid #f2c94c;border-radius:10px;padding:12px 14px;margin:0 0 14px}
+.tukan-legal-aviso p{margin:0 0 8px}
+.tukan-legal-aviso label{display:inline-flex;gap:8px;align-items:center;margin-right:10px}
+.pie-legal{font-size:.85rem;opacity:.8;margin-top:10px}
+.tukan-legal-enlaces a{color:inherit}

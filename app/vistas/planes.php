@@ -27,7 +27,7 @@ $enApp = en_app_android();
         <p style="margin:0" id="mp-t-plan">Plan <strong><?= e($u['plan_nombre'] ?? $u['plan_codigo']) ?></strong>
             <span class="etq est-<?= e($estadoCuenta) ?>"><?= e($estadoTxt) ?></span></p>
         <?php if (!$enApp): ?>
-        <p class="mp-precio"><?= dinero($me['mensual']) ?> <small>al mes</small></p>
+        <p class="mp-precio"><?= dinero($me['mensual']) ?> <small>+ IVA al mes</small></p>
         <ul class="mp-desglose">
             <li>Plan <?= dinero($me['precio_plan']) ?></li>
             <?php if ($me['precio_extra'] > 0): ?><li>módulos extra +<?= dinero($me['precio_extra']) ?></li><?php endif; ?>
@@ -84,7 +84,7 @@ $enApp = en_app_android();
                         <span class="mp-mod-precio"><?= !$on ? ($elegible ? 'Puedes elegirlo en tu plan' : (in_array($id, Modulos::SOLO_A_PEDIDO, true) || $aPedido ? 'Pídalo y le cotizamos' : 'Precio por cotización'))
                             : (in_array($id, $me['del_plan'], true) ? 'Incluido en tu plan'
                                : (in_array($id, $me['elegidos'] ?? [], true) ? 'Incluido · lo elegiste'
-                                  : ($aPedido ? 'Agregado a tu plan' : 'Extra · ' . dinero($me['precio_por_extra'][$id] ?? $m['precio_mensual']) . ' al mes'))) ?></span>
+                                  : ($aPedido ? 'Agregado a tu plan' : 'Extra · ' . dinero($me['precio_por_extra'][$id] ?? $m['precio_mensual']) . ' + IVA al mes'))) ?></span>
                         <?php if (!$on && !$pedido): ?>
                             <form method="post"><?= campo_csrf() ?><input type="hidden" name="accion" value="pedir"><input type="hidden" name="modulo" value="<?= e($id) ?>">
                                 <button class="boton boton-chico" type="submit"><?= $elegible ? 'Elegir este módulo' : 'Pedir cotización' ?></button></form>
@@ -107,13 +107,14 @@ $enApp = en_app_android();
 <?php if (!$enApp): /* App de Google Play: sin lo que se paga, ni cómo pagar, ni otros planes, ni pagos hechos */ ?>
 <section class="bloque" aria-labelledby="mp-t-pagar">
     <h2 id="mp-t-pagar">Cuánto pagas</h2>
+    <p class="suave" style="margin:0 0 8px">Los precios no incluyen el IVA: se suma al pagar y sale en tu factura.</p>
     <?php foreach (['mensual', 'semestral', 'anual'] as $per): $c = $precios[$per]; $ah = $ahorro($c, $precios['mensual']); ?>
         <div class="g-periodo">
             <div><strong><?= e($nombres[$per]) ?></strong>
                 <?= $ah > 0 ? '<span class="g-ahorro">ahorras ' . $ah . ' %</span>' : '' ?><br>
-                <small class="suave"><?= e(planes()->textoPeriodo($per)) ?><?= $per !== 'mensual' ? ' · sale a ' . dinero($c['precio_por_mes']) . ' al mes' : '' ?></small></div>
-            <strong class="monto"><?= dinero($c['monto']) ?></strong>
-            <a class="boton boton-claro boton-chico" href="<?= e($wa('Hola, quiero pagar TuRenta ' . mb_strtolower($nombres[$per]) . ' (' . dinero($c['monto']) . '). ¿Cómo hago el pago?')) ?>" target="_blank" rel="noopener">Pagar</a>
+                <small class="suave"><?= e(planes()->textoPeriodo($per)) ?><?= $per !== 'mensual' ? ' · sale a ' . dinero($c['precio_por_mes']) . ' + IVA al mes' : '' ?></small></div>
+            <strong class="monto"><?= dinero($c['monto']) ?> <small>+ IVA</small></strong>
+            <a class="boton boton-claro boton-chico" href="<?= e($wa('Hola, quiero pagar TuRenta ' . mb_strtolower($nombres[$per]) . ' (' . dinero($c['monto']) . ' + IVA). ¿Cómo hago el pago?')) ?>" target="_blank" rel="noopener">Pagar</a>
         </div>
     <?php endforeach; ?>
     <ol style="padding-left:20px;margin:12px 0 0">
@@ -180,4 +181,7 @@ $enApp = en_app_android();
         </table></div>
     <?php endif; ?>
 </section>
+<?php endif; ?>
+<?php if ($u['estado'] !== 'prueba'): /* «Cancelar mi plan» (src/TukanCancelarPlan.php) */ ?>
+<?= TukanCancelarPlan::html($cancelacion ?? null, campo_csrf(), url('planes'), $u['activo_hasta'] ?? null, en_app_android()) ?>
 <?php endif; ?>

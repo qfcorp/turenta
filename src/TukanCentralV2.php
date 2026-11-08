@@ -535,7 +535,7 @@ final class TukanCentralV2
                   . '. ¿Te ayudo a elegir tu plan y tus módulos para que sigas usándolo?' : null,
             'recordar_renovacion' => $nat === 'activo' && $n['activo_hasta']
                 ? "$hola, soy de TuRenta. El plan de $nombre vence el " . self::fechaCorta($n['activo_hasta'])
-                  . " (plan {$n['plan_nombre']} con tus módulos: $precio al mes). ¿Te paso los datos para renovarlo?" : null,
+                  . " (plan {$n['plan_nombre']} con tus módulos: $precio + IVA al mes). ¿Te paso los datos para renovarlo?" : null,
             'vencido' => in_array($nat, ['prueba_vencida', 'por_vencer', 'vencido'], true)
                 ? "$hola, soy de TuRenta. Vi que $nombre ya no tiene el plan activo. Tus datos siguen guardados. ¿Te ayudo a renovarlo?" : null,
         ];

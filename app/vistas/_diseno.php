@@ -27,6 +27,9 @@ $estadoCuenta = $u ? planes()->estadoCuenta($u) : null;
 $diasPlan = ($estadoCuenta === 'activo' && !empty($u['activo_hasta']))
     ? (int) (new DateTimeImmutable('today'))->diff(new DateTimeImmutable($u['activo_hasta']))->days : null;
 $adminViendo = !empty($_SESSION['admin_viendo']) && superadmin();
+// (7 nov 2026) El dueño acepta los términos y la privacidad de Tukán (src/TukanLegal.php); se acepta desde Mi plan
+require_once dirname(__DIR__, 2) . '/src/TukanLegal.php';
+$pideTerminos = $u && es_admin_total($u) && !$adminViendo && !TukanLegal::aceptado(db(), (string) $u['negocio_id']);
 $enApp = en_app_android();   // app de Google Play: sin «Renovar» ni enlaces para pagar el software (docs/GOOGLE_PLAY.md)
 $modulosCss = glob(RAIZ . '/public/assets/mod_*.css') ?: [];
 $modulosJs = glob(RAIZ . '/public/assets/mod_*.js') ?: [];
@@ -104,6 +107,7 @@ $modulosJs = glob(RAIZ . '/public/assets/mod_*.js') ?: [];
         <a href="<?= e(url('ayuda')) ?>">Ayuda</a>
         <a href="<?= e(url('mi_cuenta')) ?>">Mi cuenta</a>
         <a href="<?= e(url('salir')) ?>">Cerrar sesión</a>
+        <p class="pie-legal"><?= TukanLegal::enlaces(url('privacidad')) ?></p>
     </div>
 </aside>
 <?php endif; ?>
@@ -126,6 +130,7 @@ $modulosJs = glob(RAIZ . '/public/assets/mod_*.js') ?: [];
         <p class="franja-prueba no-imprimir">Tu plan vence <?= $diasPlan === 0 ? 'hoy' : "en $diasPlan " . ($diasPlan === 1 ? 'día' : 'días') ?>.
             <?php if (!$enApp): ?><a href="<?= e(url('planes')) ?>">Renovar</a><?php endif; ?></p>
     <?php endif; ?>
+    <?php if ($pideTerminos): ?><?= TukanLegal::aviso(campo_csrf(), url('planes'), url('privacidad')) ?><?php endif; ?>
     <?php foreach ($avisos as $a): ?>
         <p class="aviso aviso-<?= e($a['tipo']) ?>" role="status"><?= e($a['texto']) ?></p>
     <?php endforeach; ?>

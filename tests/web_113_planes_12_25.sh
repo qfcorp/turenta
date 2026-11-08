@@ -7,7 +7,7 @@ registrar esencial "Local Básico Doce $RANDOM"; pagar_plan esencial; NB=$NID
 sql "UPDATE negocios SET modulos_extra='paquetes,contratos,portal_cliente,plano,asistente_ia' WHERE id=$NB" > /dev/null
 check "Mi plan abre" "200" "$(get "r=planes")"
 contiene "Dice cuántos módulos trae a su elección" "$TMP/pag.html" "Tu plan trae <strong>3 módulos a tu elección</strong>"
-contiene "El cuarto módulo: «Extra · \$5»" "$TMP/pag.html" "Extra · \$5,00 al mes"
-contiene "La IA: «Extra · \$3»" "$TMP/pag.html" "Extra · \$3,00 al mes"
+contiene "El cuarto módulo: «Extra · \$5»" "$TMP/pag.html" "Extra · \$5,00 + IVA al mes"
+contiene "La IA: «Extra · \$3»" "$TMP/pag.html" "Extra · \$3,00 + IVA al mes"
 contiene "Total: \$12 + \$5 + \$3 = \$20" "$TMP/pag.html" '<p class="mp-precio">\$20,00'
 contiene "Desglose: plan \$12" "$TMP/pag.html" "Plan \$12,00"

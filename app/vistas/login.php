@@ -20,4 +20,4 @@
     <button class="boton boton-ancho" type="submit">Entrar</button>
 </form>
 <p>¿Todavía no tienes cuenta? <a href="<?= e(url('registro')) ?>">Solicitar demo</a></p>
-<p><small><a href="<?= e(url('privacidad')) ?>">Política de privacidad</a></small></p>
+<p><small><a href="https://tukansoftware.com/terminos.html" target="_blank" rel="noopener">Términos y condiciones</a> · <a href="<?= e(url('privacidad')) ?>">Política de privacidad</a></small></p>

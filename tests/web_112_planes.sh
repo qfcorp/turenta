@@ -10,9 +10,31 @@ sql "UPDATE negocios SET modulos_extra='paquetes,contratos,portal_cliente,plano,
 check "Mi plan abre" "200" "$(get "r=planes")"
 contiene "Plan Básico" "$TMP/pag.html" "Plan <strong>Básico</strong>"
 contiene "Dice cuántos módulos trae a su elección" "$TMP/pag.html" "Tu plan trae <strong>3 módulos a tu elección</strong>"
+# Aceptar los términos (módulo común TukanLegal, 7 nov 2026)
+get "r=inicio" > /dev/null
+contiene "El dueño ve el aviso para aceptar los términos y la privacidad" "$TMP/pag.html" 'value="aceptar_terminos_tukan"'
+contiene "… y el menú los enlaces Términos · Privacidad" "$TMP/pag.html" 'class="tukan-legal-enlaces"'
+post "r=planes" -d accion=aceptar_terminos_tukan > /dev/null
+check "Sin marcar la casilla no se acepta" "0" "$(sql "SELECT count(*) FROM tukan_aceptaciones WHERE cliente_id='$NB'")"
+post "r=planes" -d accion=aceptar_terminos_tukan -d acepto_terminos=1 > /dev/null
+check "Aceptar: queda guardado con la versión" "2026-10-27" "$(sql "SELECT version FROM tukan_aceptaciones WHERE cliente_id='$NB'")"
+get "r=inicio" > /dev/null
+no_contiene "Ya no sale el aviso" "$TMP/pag.html" 'value="aceptar_terminos_tukan"'
+get "r=planes" > /dev/null
+# «Cancelar mi plan» (módulo común, 7 nov 2026)
+contiene "Mi plan trae «Cancelar mi plan» con la casilla de confirmar" "$TMP/pag.html" 'name="confirmo" value="1" required'
+post "r=planes" -d accion=cancelar_plan -d motivo=x > /dev/null
+check "Sin la casilla no cancela" "0" "$(sql "SELECT count(*) FROM tukan_cancelaciones WHERE cliente_id='$NB'")"
+post "r=planes" -d accion=cancelar_plan -d confirmo=1 --data-urlencode "motivo=Ya no lo uso" > /dev/null
+check "Cancelar: queda guardada con el motivo" "Ya no lo uso" "$(sql "SELECT motivo FROM tukan_cancelaciones WHERE cliente_id='$NB'")"
+get "r=planes" > /dev/null
+contiene "… y ofrece «Seguir con mi plan»" "$TMP/pag.html" 'value="seguir_plan"'
+post "r=planes" -d accion=seguir_plan > /dev/null
+check "Seguir con mi plan: se quita" "0" "$(sql "SELECT count(*) FROM tukan_cancelaciones WHERE cliente_id='$NB'")"
+get "r=planes" > /dev/null
 contiene "… sin módulos por elegir" "$TMP/pag.html" 'data-por-elegir="0"'
 contiene "Los elegidos dicen «Incluido»" "$TMP/pag.html" "Incluido · lo elegiste"
-contiene "El cuarto módulo y el Asistente IA: «Extra · \$5»" "$TMP/pag.html" "Extra · \$5,00 al mes"
+contiene "El cuarto módulo y el Asistente IA: «Extra · \$5»" "$TMP/pag.html" "Extra · \$5,00 + IVA al mes"
 contiene "Total: \$20 + \$5 + \$5 = \$30" "$TMP/pag.html" '<p class="mp-precio">\$30,00'
 contiene "Desglose: plan \$20" "$TMP/pag.html" "Plan \$20,00"
 no_contiene "Sin el precio de un módulo que no tiene (Invitados \$8)" "$TMP/pag.html" "\$8,00"

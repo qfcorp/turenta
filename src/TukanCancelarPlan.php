@@ -150,11 +150,20 @@ final class TukanCancelarPlan
                 . $tu('Sigues usando todo hasta el fin del período que ya pagaste.', 'Sigue usando todo hasta el fin del período que ya pagó.') . '</p></section>';
         }
         if ($estado) {
+            // (10 nov 2026, pedido del dueño de Tukán: «debe salir algún mensaje… aplasté dos veces porque no pasaba nada») confirmación clara, en verde
             $f = self::fecha($estado['hasta'] ?? null);
-            return $h . '<p class="aviso">' . $tu('Pediste cancelar tu plan', 'Pidió cancelar su plan') . ' el ' . self::e(self::fecha(substr((string) $estado['pedida'], 0, 10))) . '. '
-                . ($f !== '' ? $tu('Sigues usando todo hasta el ', 'Sigue usando todo hasta el ') . '<strong>' . self::e($f) . '</strong> y después no se cobra más.' : 'No se renovará.')
-                . ' ' . $tu('Tus datos se guardan por si vuelves.', 'Sus datos se guardan por si vuelve.') . '</p>'
-                . '<form method="post" action="' . self::e($accion) . '">' . $csrf . '<input type="hidden" name="accion" value="seguir_plan">'
+            $avisada = (int) ($estado['avisada'] ?? 0) === 1;
+            return $h . '<div class="aviso aviso-ok tc-cancelado" role="status" style="border-left:4px solid #1F8A4C;background:#E3F4EA;color:#14213D;padding:12px 14px;border-radius:10px">'
+                . '<p style="margin:0 0 6px"><strong>✅ ' . $tu('Tu plan quedó cancelado.', 'Su plan quedó cancelado.') . '</strong> ' . $tu('Pediste cancelar tu plan', 'Pidió cancelar su plan') . ' el '
+                . self::e(self::fecha(substr((string) $estado['pedida'], 0, 10))) . '.</p>'
+                . '<p style="margin:0 0 6px">' . ($f !== '' ? $tu('Sigues usando todo hasta el ', 'Sigue usando todo hasta el ') . '<strong>' . self::e($f) . '</strong> y después no se cobra más.' : 'No se renovará.') . '</p>'
+                . '<p style="margin:0">' . ($avisada
+                    ? $tu('Si pagabas con tarjeta, ya no se te volverá a cobrar.', 'Si pagaba con tarjeta, ya no se le volverá a cobrar.')
+                    : $tu('Estamos avisando al sistema de pagos: si pagabas con tarjeta, el cobro automático se cancela en unos minutos. No hace falta que vuelvas a tocar nada.',
+                          'Estamos avisando al sistema de pagos: si pagaba con tarjeta, el cobro automático se cancela en unos minutos. No hace falta que vuelva a tocar nada.'))
+                . ' ' . $tu('Tus datos se guardan por si vuelves.', 'Sus datos se guardan por si vuelve.') . '</p></div>'
+                . '<form method="post" action="' . self::e($accion) . '" class="tc-form" style="margin-top:12px" onsubmit="' . self::ocupado($tu('Un momento…', 'Un momento…')) . '">' . $csrf
+                . '<input type="hidden" name="accion" value="seguir_plan">'
                 . '<button class="boton" type="submit">Seguir con mi plan</button></form></section>';
         }
         $f = self::fecha($hasta);
@@ -164,9 +173,22 @@ final class TukanCancelarPlan
                          : $tu('Sigues usando todo hasta el fin de lo que ya pagaste y después no se cobra más. ', 'Sigue usando todo hasta el fin de lo que ya pagó y después no se cobra más. '))
             . $tu('Si pagas con tarjeta, no se te vuelve a cobrar. Tus datos no se borran: si cambias de idea, vuelves cuando quieras.',
                   'Si paga con tarjeta, no se le vuelve a cobrar. Sus datos no se borran: si cambia de idea, vuelve cuando quiera.') . '</p>'
-            . '<form method="post" action="' . self::e($accion) . '">' . $csrf . '<input type="hidden" name="accion" value="cancelar_plan">'
+            . '<form method="post" action="' . self::e($accion) . '" class="tc-form" onsubmit="' . self::ocupado($tu('Cancelando tu plan… espera unos segundos, no cierres esta página.', 'Cancelando su plan… espere unos segundos, no cierre esta página.')) . '">' . $csrf . '<input type="hidden" name="accion" value="cancelar_plan">'
             . '<label>' . $tu('¿Por qué te vas? (opcional)', '¿Por qué se va? (opcional)') . '<textarea name="motivo" rows="2" maxlength="500"></textarea></label>'
             . '<label class="tc-confirmo"><input type="checkbox" name="confirmo" value="1" required> Sí, quiero cancelar mi plan</label>'
-            . '<button class="boton boton-peligro" type="submit">Cancelar mi plan</button></form></details></section>';
+            . '<button class="boton boton-peligro" type="submit">Cancelar mi plan</button>'
+            . '<p class="tc-espera" role="status" aria-live="polite" style="margin:8px 0 0;font-weight:600"></p></form></details></section>';
+    }
+
+    /**
+     * (10 nov 2026) Al tocar el botón: lo deja gris y sin poder tocarse otra vez, con el texto «Cancelando…», para que se vea que
+     * algo está pasando (avisar al Panel y a Plux tarda unos segundos) y no se aprete dos veces. Va en el onsubmit del formulario.
+     */
+    private static function ocupado(string $texto): string
+    {
+        $t = json_encode($texto, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT);
+        $js = "if(this.dataset.enviado){return false;}this.dataset.enviado='1';var b=this.querySelector('button[type=submit]');"
+            . "if(b){b.disabled=true;b.style.opacity='.6';b.textContent=$t;}var m=this.querySelector('.tc-espera');if(m){m.textContent=$t;}return true;";
+        return self::e($js);
     }
 }

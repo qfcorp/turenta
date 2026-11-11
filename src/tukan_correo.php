@@ -21,12 +21,12 @@ declare(strict_types=1);
  * - La clave nunca sale en los errores ni en los registros.
  * - Probar desde la consola:  sudo -u www-data php tukan_correo.php probar destino@correo.com
  *
- * Versión 1 (2026-10-21). Si cambias este archivo en el Panel Tukán Central, copia la versión nueva a cada programa.
+ * Versión 2 (2026-11-10): opción 'adjuntos' (archivos adjuntos, p. ej. el manual en PDF). Versión 1 (2026-10-21). Si cambias este archivo en el Panel Tukán Central, copia la versión nueva a cada programa.
  */
 
 if (!function_exists('tukan_correo_enviar')) {
 
-    define('TUKAN_CORREO_VERSION', '1');
+    define('TUKAN_CORREO_VERSION', '2');
 
     /** Lee la configuración (archivo + variables de entorno). Uso interno: trae la clave. */
     function tukan_correo_config(bool $recargar = false): array
@@ -159,17 +159,35 @@ if (!function_exists('tukan_correo_enviar')) {
             return implode("\r\n", $cab) . "\r\n\r\n" . $qp($texto) . "\r\n";
         }
         $limite = '=_tukan_' . bin2hex(random_bytes(8));
-        $cab[] = "Content-Type: multipart/alternative; boundary=\"$limite\"";
-        return implode("\r\n", $cab) . "\r\n\r\n"
-            . "Este es un mensaje en formato MIME.\r\n\r\n"
-            . "--$limite\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n" . $qp($texto) . "\r\n"
+        $alternativa = "--$limite\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n" . $qp($texto) . "\r\n"
             . "--$limite\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n" . $qp($html) . "\r\n"
             . "--$limite--\r\n";
+        // Versión 2: archivos adjuntos (opciones['adjuntos'] = [['nombre' => 'Manual.pdf', 'tipo' => 'application/pdf', 'datos' => bytes], ...])
+        $adjuntos = array_values(array_filter(is_array($opciones['adjuntos'] ?? null) ? $opciones['adjuntos'] : [],
+            fn($a) => is_array($a) && is_string($a['datos'] ?? null) && $a['datos'] !== '' && is_string($a['nombre'] ?? null)));
+        if ($adjuntos === []) {
+            $cab[] = "Content-Type: multipart/alternative; boundary=\"$limite\"";
+            return implode("\r\n", $cab) . "\r\n\r\nEste es un mensaje en formato MIME.\r\n\r\n" . $alternativa;
+        }
+        $mixto = '=_tukan_m_' . bin2hex(random_bytes(8));
+        $cab[] = "Content-Type: multipart/mixed; boundary=\"$mixto\"";
+        $cuerpo = implode("\r\n", $cab) . "\r\n\r\nEste es un mensaje en formato MIME.\r\n\r\n"
+            . "--$mixto\r\nContent-Type: multipart/alternative; boundary=\"$limite\"\r\n\r\n" . $alternativa;
+        foreach ($adjuntos as $a) {
+            $nombre = (string) preg_replace('/[^A-Za-z0-9._ -]+/', '_', tukan_correo_limpiar_cabecera(strtr((string) $a['nombre'],
+                ['á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ñ' => 'n', 'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U', 'Ñ' => 'N'])));
+            $nombre = substr(trim($nombre), 0, 80) ?: 'archivo';
+            $tipo = preg_match('#^[a-z]+/[a-z0-9.+-]+$#', (string) ($a['tipo'] ?? '')) ? (string) $a['tipo'] : 'application/octet-stream';
+            $cuerpo .= "--$mixto\r\nContent-Type: $tipo; name=\"$nombre\"\r\nContent-Transfer-Encoding: base64\r\n"
+                . "Content-Disposition: attachment; filename=\"$nombre\"\r\n\r\n" . chunk_split(base64_encode($a['datos']), 76, "\r\n");
+        }
+        return $cuerpo . "--$mixto--\r\n";
     }
 
     /**
      * Manda un correo. Devuelve true si el servidor lo aceptó; si no, false y $error en palabras sencillas (sin la clave).
-     * $opciones (opcional): responder_a (Reply-To), nombre_para (nombre del destinatario).
+     * $opciones (opcional): responder_a (Reply-To), nombre_para (nombre del destinatario),
+     * adjuntos (lista de ['nombre', 'tipo', 'datos']; versión 2).
      */
     function tukan_correo_enviar(string $para, string $asunto, string $html, string $texto, ?string &$error = null, array $opciones = []): bool
     {

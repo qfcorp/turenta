@@ -2,7 +2,7 @@
 
 Versión con capturas: [Manual_TuRenta.pdf](Manual_TuRenta.pdf). Las capturas están en [manual/capturas](manual/capturas) y salen del local de ejemplo «Quinta Demo Tukanec».
 Para regenerar todo (base de ejemplo, capturas y PDF): `bash docs/manual/generar/generar.sh`.
-Ayuda: WhatsApp 098 366 2181 · info@tukansoftware.com · tukansoftware.com
+Ayuda: WhatsApp 098 366 2181 · info@tukansoftware.com · tukansoftware.com · Grupo de ayuda en Telegram: https://t.me/+dQfU0W9yvo85MzRh
 
 Cada parte dice si es de la **base** (la tienen todos) o de un **módulo** (se enciende en Mi plan). Si un módulo no está en tu plan, su pantalla dice «Este módulo no está en tu plan». Apagar un módulo nunca borra datos.
 
@@ -11,7 +11,7 @@ Cada parte dice si es de la **base** (la tienen todos) o de un **módulo** (se e
 ## 1. Qué es TuRenta y cómo se arma
 Sistema para salones de eventos, quintas y haciendas de Ecuador. Celular, tablet o computadora, sin instalar nada.
 - **Base:** calendario sin doble reserva y próximos sábados, eventos con estados, seguimiento, tareas y lista de espera, clientes, espacios y fechas cerradas, catálogo, cotizaciones (IVA, descuento, versiones, PDF con QR y enlace para aceptar), plan de pagos, recibos y comprobantes, mensajes de WhatsApp del día, página pública, reportes básicos, usuarios con cargos, app instalable.
-- **Módulos:** Paquetes y simulador · Contratos con firma · Portal del cliente · Cobros en línea (Payphone) · Formulario, extras y encuesta · Día del evento · Invitados con QR · Plano del salón · Mobiliario y menaje · Boda en vivo · Proveedores y compras · Portal del proveedor · Incidencias y puntaje · Metas y reportes avanzados · Avisos por Telegram · Exportar a Excel y Google Calendar · **Asistente IA** (incluido en Completo; en Básico se pide aparte y no cuenta entre los 3 que eliges).
+- **Módulos:** Paquetes y simulador · Contratos con firma · Portal del cliente · Cobros en línea (Stripe o Payphone) · Formulario, extras y encuesta · Día del evento · Invitados con QR · Plano del salón · Mobiliario y menaje · Boda en vivo · Proveedores y compras · Portal del proveedor · Incidencias y puntaje · Metas y reportes avanzados · Avisos por Telegram · Exportar a Excel y Google Calendar · **Asistente IA** (incluido en Completo; en Básico se pide aparte y no cuenta entre los 3 que eliges).
 - **Planes:** **Básico** (la base + **3 módulos que tú eliges**; 1 espacio, 2 usuarios) y **Completo** (todos los módulos, con el **Asistente IA** incluido, sin límite de espacios ni de usuarios). Si necesitas más módulos en el Básico, se suman a tu plan. Tukán cotiza por WhatsApp.
 
 ## 2. Entrar y la pantalla de Inicio (base)
@@ -117,8 +117,17 @@ Periodos Este mes / Mes pasado / Este año / Otras fechas. Secciones: Ventas, Co
 ## 18. Mi plan, módulos y demos
 **Más → Mi plan:** tus módulos encendidos. En el Básico dice «Tu plan trae 3 módulos a tu elección» y cuántos te quedan: los que elegiste dicen «Incluido · lo elegiste», los demás que pagas dicen «Extra», y mientras te queden por elegir, los que no tienes dicen «Puedes elegirlo en tu plan» con el botón **Elegir este módulo**. Si ya elegiste tus 3, los que no tienes dicen «Precio por cotización» y tienen **Pedir cotización** (también en la pantalla del módulo apagado y en cada plan); **Preguntar por WhatsApp** para renovar (Tukán te cotiza). Demos: **Solicitar demo** → Tukán la prepara con datos de ejemplo y todos los módulos por los días acordados; al terminar, «Tu demo terminó» y los datos quedan guardados.
 
+## 18b. Reserva en línea y cobro con Stripe (módulo Cobros en línea; negocios de alquiler para fiestas)
+El cliente entra a una página tuya (puede salir en inglés), elige la fiesta, la fecha y una **hora libre**, escribe la dirección de la fiesta y paga el depósito o todo con tarjeta.
+1. **Más → Espacios:** cada equipo (ej. un camión) puede tener sus minutos de **Montaje** y **Desmontaje** (vacío = lo de Reglas).
+2. **Más → Paquetes → Reserva en línea:** marca **Se reserva en línea**, **Nombre corto para la dirección**, duración, máximo de invitados, foto y qué equipos pueden hacerlo (usa el primero libre).
+3. **Configuración → Reserva en línea y Stripe:** **Abrir la reserva en línea**, idioma de las páginas del cliente, aviso mínimo (días), primera y última hora de inicio, cada cuántos minutos, condiciones → **Guardar reserva en línea y Stripe**. Ahí sale el enlace para tus clientes y tu página web.
+4. **Pago con tarjeta (Stripe):** pega **Secret key**, **Publishable key** y **Signing secret del webhook**. Claves «test» = modo prueba (nadie paga de verdad); «live» = cobra de verdad.
+5. **Tiempo de viaje con mapa (opcional):** **Calcular el tiempo de viaje con el mapa** + **Dirección de tu base**; no se ofrecen horas que no alcanzan por el viaje. Sin clave de Google usa mapas gratuitos.
+La hora queda retenida solo ese día; al pagar, la fecha se separa sola; si otro tomó el equipo mientras pagaba, pasa a otro equipo libre del mismo paquete; nunca se cobra dos veces. En inglés, el cliente tiene su portal «My Party» (estado, cuenta regresiva, pagos y pagar el saldo).
+
 ## 19. Ayuda e inteligencia artificial
-- **Ayuda (base, todos los planes y cargos):** **Más → Ayuda** → cuadro **¿Qué necesita hacer?** (hasta 500 letras) → **Preguntar**. Responde al instante y paso a paso con este manual. Las preguntas que ya se hicieron quedan guardadas (Tukán las revisa) y salen de inmediato. Hasta 10 preguntas por minuto. Si no sirvió: **WhatsApp 098 366 2181**.
+- **Ayuda (base, todos los planes y cargos):** **Más → Ayuda** → cuadro **¿Qué necesita hacer?** (hasta 500 letras) → **Preguntar**. Responde al instante y paso a paso con este manual. Las preguntas que ya se hicieron quedan guardadas (Tukán las revisa) y salen de inmediato. Hasta 10 preguntas por minuto. Si no sirvió: **WhatsApp 098 366 2181**.  Grupo de ayuda en Telegram: https://t.me/+dQfU0W9yvo85MzRh
 - **Asistente IA (incluido en el plan Completo; en el Básico, «Pídalo y le cotizamos» en Mi plan):** en **Eventos** o **Nuevo evento** → **✨ Desde un mensaje de WhatsApp** → pega el mensaje del cliente («boda de 150 personas el 14 de febrero con DJ…») → **Proponer la cotización** → borrador con cliente, tipo, fecha, horas, invitados, espacio, paquete y productos de **tu catálogo** (lo que no tienes va en notas; lo que falta preguntar, en **Falta preguntarle al cliente**) → revisa → **Guardar evento y cotización** (evento en Consulta y cotización en borrador; no se envía nada al cliente).
 - Si no se puede leer el mensaje automáticamente: «En este momento no pudimos procesar el texto automáticamente; puede hacerlo a mano aquí» con el enlace a **Nuevo evento**. Sin el módulo, el botón no aparece.
 - Para Tukán: la IA se configura una vez en el servidor (`/etc/tukan-ia.env`, `bash deploy/configurar_ia.sh` del Panel Tukán Central). Sin ese archivo la Ayuda responde con las preguntas guardadas y el manual. Gasto por negocio y mes con tope (4,00 USD con el módulo, incluido o comprado aparte; 0,50 USD sin él; una demo, 0,50 USD en total aunque tenga todos los módulos; Tukán lo cambia desde el Panel con «Tope de IA»), en el Panel → Más → IA. Preguntas guardadas: Panel de TuRenta → **Preguntas IA**.

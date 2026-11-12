@@ -94,7 +94,7 @@ h.append(paso(10, 'Cobre y dé seguimiento cada mañana', 'Botón Cobros · Men�
     'En el <b>Inicio</b> revise los <b>Seguimientos de hoy</b> (llamadas y visitas) y márquelos como <b>Hecho</b>.']))
 
 h.append('''<div class="fin"><b>¿Listo? Ya puede trabajar.</b> Para paquetes, portal del cliente, día del evento, invitados con QR, proveedores, reportes y todo lo demás,
-vea el <b>Manual de TuRenta</b>.<br><br>¿Cómo se hace algo? En <b>Más → Ayuda</b> escriba su pregunta y toque <b>Preguntar</b>: le respondemos al instante con el manual.<br>¿Dudas? Escríbanos por <b>WhatsApp 098 366 2181</b> · info@tukansoftware.com · tukansoftware.com</div>''')
+vea el <b>Manual de TuRenta</b>.<br><br>¿Cómo se hace algo? En <b>Más → Ayuda</b> escriba su pregunta y toque <b>Preguntar</b>: le respondemos al instante con el manual.<br>¿Dudas? Escríbanos por <b>WhatsApp 098 366 2181</b> o entre al <b>grupo de ayuda en Telegram</b>: https://t.me/+dQfU0W9yvo85MzRh · info@tukansoftware.com · tukansoftware.com</div>''')
 
 html = f'<!doctype html><html lang="es"><head><meta charset="utf-8"><style>{css}</style></head><body>{"".join(h)}</body></html>'
 open(f'{D}/primeros_pasos.html', 'w').write(html)

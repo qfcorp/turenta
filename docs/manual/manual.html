@@ -138,7 +138,7 @@ table.t tr:nth-child(even) td { background: #FAFBFD; }
     <tr><td>🎁 Paquetes y simulador</td><td>Paquetes armados (Boda Oro, Quince años…) que cargan la cotización en un toque, con simulador por número de invitados</td></tr>
     <tr><td>✍️ Contratos con firma</td><td>Contrato con tu plantilla que el cliente firma con el dedo en su celular, con QR de verificación y anexos por extras</td></tr>
     <tr><td>📱 Portal del cliente</td><td>Un enlace propio del cliente, sin claves: sus pagos, su contrato, sus invitados y los comprobantes que sube</td></tr>
-    <tr><td>💳 Cobros en línea (Payphone)</td><td>El cliente paga sus cuotas con tarjeta desde el portal (necesita el Portal del cliente)</td></tr>
+    <tr><td>💳 Cobros en línea (Stripe o Payphone)</td><td>El cliente paga sus cuotas con tarjeta desde el portal (necesita el Portal del cliente)</td></tr>
     <tr><td>📝 Formulario, extras y encuesta</td><td>Formulario del evento, extras pedidos en línea y encuesta de satisfacción (necesita el Portal del cliente)</td></tr>
     <tr><td>⏱️ Día del evento</td><td>Cronograma con modo en vivo, personal con su propio enlace y hoja del evento en PDF</td></tr>
     <tr><td>🎟️ Invitados con QR</td><td>Lista, mesas, invitación digital con confirmación y control de ingreso con QR en la puerta</td></tr>
@@ -445,7 +445,7 @@ table.t tr:nth-child(even) td { background: #FAFBFD; }
   <h2>Cobros (todo el local)</h2>
   <p>En <b>Cobros</b> ves lo cobrado este mes y el anterior, el <b>total por cobrar</b>, lo <b>vencido</b>, los comprobantes por revisar, las cuotas vencidas y las que vencen en 7, 15 o 30 días (cada una con <b>WhatsApp</b>, <b>Ver evento</b> y <b>Registrar pago</b>) y las <b>garantías por devolver</b>.</p>
   <figure class="pc"><img src="capturas/14_cobros.png" alt=""><figcaption>Cobros: lo que te deben, lo cobrado y a quién recordarle hoy.</figcaption></figure>
-  <div class="consejo"><b>Pago con tarjeta</b>Con el módulo <b>Cobros en línea (Payphone)</b> y tus claves en Configuración → Cobros en línea, el cliente paga sus cuotas con tarjeta desde su portal y el pago se registra solo.</div>
+  <div class="consejo"><b>Pago con tarjeta</b>Con el módulo <b>Cobros en línea (Stripe o Payphone)</b> y tus claves (Payphone en Configuración → Cobros en línea; Stripe en Configuración → Reserva en línea y Stripe), el cliente paga sus cuotas con tarjeta desde su portal y el pago se registra solo.</div>
 </section>
 
 <section class="cap" id="c13">
@@ -622,6 +622,21 @@ table.t tr:nth-child(even) td { background: #FAFBFD; }
   </ul>
 </section>
 
+<section class="sigue" id="c18b">
+  <h2>Reserva en línea y cobro con Stripe (negocios de alquiler para fiestas)</h2>
+  <span class="plan">Módulo Cobros en línea · para negocios que llevan sus equipos a la casa del cliente (espuma, nieve, inflables, carpas…)</span>
+  <p>Tu cliente entra a una página tuya, elige la fiesta, la fecha y una <b>hora libre</b>, escribe la dirección de la fiesta y paga el depósito o todo con tarjeta. No tienes que contestar mensajes para ver si hay hora: el sistema solo ofrece las horas en que un equipo está libre. Las páginas del cliente pueden salir en <b>inglés</b>.</p>
+  <ol class="pasos">
+    <li><b>Crea tus equipos.</b> En <b>Más → Espacios</b>, cada equipo (por ejemplo, un camión) puede tener sus minutos de <b>Montaje</b> y <b>Desmontaje</b>. Si los dejas vacíos, usa las horas de <b>Reglas</b>.</li>
+    <li><b>Prepara tus paquetes.</b> En <b>Más → Paquetes</b>, en la parte <b>Reserva en línea</b>, marca <b>Se reserva en línea</b>, escribe el <b>Nombre corto para la dirección</b>, la duración, el máximo de invitados y la foto, y marca qué equipos pueden hacer ese paquete. La reserva usa el primero que esté libre.</li>
+    <li><b>Abre la reserva.</b> En <b>Configuración → Reserva en línea y Stripe</b> marca <b>Abrir la reserva en línea</b>, elige el idioma de las páginas del cliente, el aviso mínimo en días, la primera y la última hora de inicio, cada cuántos minutos se ofrece una hora y las condiciones que acepta el cliente. Toca <b>Guardar reserva en línea y Stripe</b>. Ahí mismo aparece el enlace para tus clientes y para el botón «Book» de tu página web.</li>
+    <li><b>Conecta Stripe.</b> En la misma pantalla, en <b>Pago con tarjeta (Stripe)</b>, pega la <b>Secret key</b>, la <b>Publishable key</b> y el <b>Signing secret del webhook</b> que sacas de tu cuenta de Stripe (la pantalla explica los pasos). Con claves «test» es modo prueba: nadie paga de verdad. Para cobrar de verdad, pon las claves «live». Stripe cobra su comisión y deposita en tu cuenta bancaria.</li>
+    <li><b>Tiempo de viaje con mapa (opcional).</b> En la parte <b>Tiempo de viaje con mapa</b> marca <b>Calcular el tiempo de viaje con el mapa</b> y escribe la <b>Dirección de tu base</b>, de donde salen los equipos. TuRenta calcula cuánto demora el equipo en llegar a la dirección de la fiesta y en volver, y no ofrece horas que no alcanzan. Puedes poner un margen por viaje y el viaje más largo que aceptas en línea. Sin clave de Google usa mapas gratuitos.</li>
+  </ol>
+  <div class="nota"><b>Cómo se separa la fecha</b>La hora queda retenida solo ese día. Cuando el cliente paga, la fecha queda <b>separada</b> sola. Si no paga, la hora se libera. Si mientras pagaba otro cliente tomó ese equipo, el sistema pasa la fiesta a otro equipo libre del mismo paquete. Nunca se cobra dos veces.</div>
+  <div class="nota"><b>El portal «My Party»</b>Si tus páginas están en inglés, el cliente ve en su portal el estado de su fiesta, la cuenta regresiva, los pasos que le faltan, sus pagos y un botón para pagar el saldo.</div>
+</section>
+
 <section class="cap" id="c19">
   <h1><span class="num">19</span> Ayuda e inteligencia artificial</h1>
   <span class="plan">Ayuda: base (todos los planes y todos los cargos) · Asistente IA: incluido en Completo, se pide aparte en el Básico</span>
@@ -630,7 +645,7 @@ table.t tr:nth-child(even) td { background: #FAFBFD; }
   <ol class="pasos">
     <li>Escribe tu pregunta en el cuadro <b>¿Qué necesita hacer?</b> (hasta 500 letras). Por ejemplo: «¿Cómo registro un pago?» o «¿Cómo envío la cotización por WhatsApp?».</li>
     <li>Toca <b>Preguntar</b> y lee la respuesta. Una pregunta a la vez funciona mejor.</li>
-    <li>Si no te sirvió, toca <b>escríbanos por WhatsApp 098 366 2181</b>: te ayudamos nosotros.</li>
+    <li>Si no te sirvió, escríbenos por <b>WhatsApp 098 366 2181</b> o entra al <b>grupo de ayuda en Telegram</b> (https://t.me/+dQfU0W9yvo85MzRh): te ayudamos nosotros.</li>
   </ol>
   <figure class="pc m90"><img src="capturas/36_ayuda.png" alt=""><figcaption>Ayuda: la pregunta y su respuesta.</figcaption></figure>
   <div class="consejo"><b>Respuestas para todos</b>Las preguntas que ya se hicieron quedan guardadas y Tukán las revisa: si alguien pregunta lo mismo, la respuesta sale de inmediato. Puedes hacer hasta 10 preguntas por minuto.</div>
@@ -670,12 +685,12 @@ table.t tr:nth-child(even) td { background: #FAFBFD; }
   <h3>¿Se puede usar sin internet?</h3>
   <p>Necesita internet, pero funciona con los datos del celular. Instálalo como app para abrirlo más rápido.</p>
   <h3>¿Dónde pregunto cómo se hace algo?</h3>
-  <p>En <b>Más → Ayuda</b>: escribe tu pregunta y toca <b>Preguntar</b> (capítulo 19). Si no te sirve, escríbenos por WhatsApp.</p>
+  <p>En <b>Más → Ayuda</b>: escribe tu pregunta y toca <b>Preguntar</b> (capítulo 19). Si no te sirve, escríbenos por WhatsApp o entra al grupo de ayuda en Telegram: https://t.me/+dQfU0W9yvo85MzRh.</p>
   <h3>Si apagamos un módulo, ¿pierdo la información?</h3>
   <p>No. Se esconden sus pantallas, botones y enlaces, pero los datos quedan guardados y vuelven al encenderlo.</p>
   <h3>¿Cuánto cuesta?</h3>
   <p>Depende de los módulos que necesite tu local. Escríbenos y te mandamos la cotización.</p>
-  <div class="contacto"><b>¿Necesitas ayuda?</b><br>WhatsApp de Tukán: <b>098 366 2181</b> · Correo: <b>info@tukansoftware.com</b> · Web: <b>tukansoftware.com</b></div>
+  <div class="contacto"><b>¿Necesitas ayuda?</b><br>WhatsApp de Tukán: <b>098 366 2181</b> · Correo: <b>info@tukansoftware.com</b> · Web: <b>tukansoftware.com</b><br>Grupo de ayuda en Telegram: <b>https://t.me/+dQfU0W9yvo85MzRh</b></div>
 </section>
 
 <section class="cap" id="c21">
@@ -685,7 +700,7 @@ table.t tr:nth-child(even) td { background: #FAFBFD; }
   <p>La primera vez que entras como dueño, arriba sale un aviso: «Antes de seguir, lee y acepta los Términos y condiciones y la Política de privacidad de Tukán Software». Ábrelos con sus enlaces, marca <b>Leí y acepto los términos y la política de privacidad</b> y toca <b>Aceptar</b>. Se guarda quién aceptó y cuándo; el aviso no vuelve a salir hasta que cambien los términos.</p>
   <p>En el menú y en la pantalla de entrar están siempre los enlaces <b>Términos</b> y <b>Privacidad</b>.</p>
   <h2>Precios en Mi plan</h2>
-  <p>Los precios del software en Mi plan no incluyen el IVA: dicen <b>+ IVA</b>. El IVA se suma al pagar y sale en tu factura.</p>
+  <p>Los precios del software en Mi plan no incluyen el IVA: dicen <b>+ IVA</b>. El IVA se suma al pagar y sale en tu factura. Se paga por transferencia o DeUna: Tukán te manda los datos y tú le envías el comprobante. No hay devoluciones si el programa ya se usó.</p>
   <h2>Cancelar mi plan</h2>
   <p>En <b>Mi plan</b>, al final, toca <b>Quiero cancelar mi plan</b>. Escribe el motivo si quieres, marca <b>Sí, quiero cancelar mi plan</b> y toca <b>Cancelar mi plan</b>.</p>
   <ul>

@@ -81,6 +81,8 @@ class Manejador(BaseHTTPRequestHandler):
             fin(401); return self.error(401, 'authentication_error', 'invalid x-api-key')
         if self.headers.get('anthropic-version') != '2023-06-01':
             fin(400); return self.error(400, 'invalid_request_error', 'anthropic-version header is required')
+        if 'temperature' in p:  # (23 nov 2026) como la API real con los modelos 5.5
+            fin(400); return self.error(400, 'invalid_request_error', '`temperature` is deprecated for this model.')
         if p.get('model') == 'modelo-inexistente':
             fin(404); return self.error(404, 'not_found_error', 'model: modelo-inexistente')
         m = re.search(r'FORZAR_429:(\d+)', texto)
